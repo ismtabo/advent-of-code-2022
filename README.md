@@ -1,5 +1,9 @@
 # Advent of code Deno Template
 
+![](https://img.shields.io/badge/day%20📅-1-blue)
+![](https://img.shields.io/badge/stars%20⭐-2-yellow)
+![](https://img.shields.io/badge/days%20completed-1-red)
+
 Template repository of solutions for the [Advent of Code][4] done by [ismtabo][1].
 Create a new repository based on this template to use Deno in your Advent of Code solutions.
 
