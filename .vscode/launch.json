@@ -7,7 +7,7 @@
     {
       "name": "Launch Deno",
       "request": "launch",
-      "type": "pwa-node",
+      "type": "node",
       "program": "./src/cli/mod.ts",
       "runtimeExecutable": "deno",
       "cwd": "${workspaceFolder}",
@@ -18,17 +18,18 @@
         "--allow-all",
       ],
       "args": [
-        "run",
-        "-d2",
-        "-p2",
-        "--sample",
+        "download",
+        "-d1",
+        // "-p2",
+        // "--sample",
         // "--file=src/solutions/day10/sample_1.txt"
+        "--force"
       ],
       "attachSimplePort": 9229,
       "outputCapture": "std"
     },
     {
-      "type": "pwa-node",
+      "type": "node",
       "request": "launch",
       "name": "Launch Deno Test",
       "program": "${workspaceFolder}/src/solutions/day18/partTwo/test.ts",

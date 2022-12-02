@@ -20,8 +20,8 @@ After installing it you can run the solutions using the cli tool:
 ```
 $ deno run -A --unstable src/cli/mod.ts -h
 
-  Usage:   aoc
-  Version: <version>
+  Usage:   aoc  
+  Version: 0.1.1
 
   Description:
 
@@ -29,14 +29,17 @@ $ deno run -A --unstable src/cli/mod.ts -h
 
   Options:
 
-    -h, --help     - Show this help.
-    -V, --version  - Show the version number for this program.
+    -h, --help     - Show this help.                            
+    -V, --version  - Show the version number for this program.  
 
   Commands:
 
-    run      - Run day solution
-    run-all  - Run multiple day solution
-    new      - Create new day solution folder skeleton
+    run       - Run day solution                       
+    run-all   - Run multiple day solution              
+    new       - Create new day solution folder skeleton
+    download  - Download input text file for given day 
+
+
 
 ```
 
@@ -48,7 +51,7 @@ The solutions can be run with the `run` sub-command:
 $ deno run -A --unstable src/cli/mod.ts run -h
 
   Usage:   aoc run
-  Version: <version>
+  Version: 0.1.1  
 
   Description:
 
@@ -56,14 +59,14 @@ $ deno run -A --unstable src/cli/mod.ts run -h
 
   Options:
 
-    -h, --help                        - Show this help.
-    -d, --day        <day:number>     - Day to run
-    -p, --part       <part:number>    - Part of the day solution to run.                             (Default: 1)
-    -a, --all-parts                   - Execute both parts. If present part option will be ignore.
-    -t, --time                        - Show spent time
-    -f, --file       <file:string>    - Input file. If missing, the day input file is used instead.
-    --sample                          - Run day using sample input instead of day input file.        (conflicts: file)
-    --format         <format:string>  - Output format.                                               (Default: "plain")
+    -h, --help                 - Show this help.                                                                 
+    -d, --day        <day>     - Day to run                                                   (required)         
+    -p, --part       <part>    - Part of the day solution to run.                             (required)         
+    -a, --all-parts            - Execute both parts. If present part option will be ignore.   (Conflicts: --part)
+    -t, --time                 - Show spent time                                                                 
+    -f, --file       <file>    - Input file. If missing, the day input file is used instead.                     
+    --sample                   - Run day using sample input instead of day input file.        (Conflicts: --file)
+    --format         <format>  - Output format. (Available formats: plain, json, csv)         (Default: "plain") 
 
 ```
 
@@ -73,7 +76,7 @@ Also, to run all the solutions you can use `run-all` sub-command:
 $ deno run -A --unstable src/cli/mod.ts run-all -h
 
   Usage:   aoc run-all
-  Version: <version>
+  Version: 0.1.1      
 
   Description:
 
@@ -81,12 +84,12 @@ $ deno run -A --unstable src/cli/mod.ts run-all -h
 
   Options:
 
-    -h, --help                        - Show this help.
-    -p, --part       <part:number>    - Part of the day solution to run.                            (Default: 1)
-    -a, --all-parts                   - Execute both parts. If present part option will be ignore.
-    -t, --time                        - Show spent time
-    --sample                          - Run day using sample input instead of day input file.
-    --format         <format:string>  - Output format.                                              (Default: "plain")
+    -h, --help                 - Show this help.                                                                  
+    -p, --part       <part>    - Part of the day solution to run.                              (Default: 1)       
+    -a, --all-parts            - Execute both parts. If present 'part' option will be ignore.  (Conflicts: --part)
+    -t, --time                 - Show spent time                                                                  
+    --sample                   - Run day using sample input instead of day input file.                            
+    --format         <format>  - Output format. (Available formats: plain, json, csv)          (Default: "plain") 
 
 ```
 
@@ -100,6 +103,73 @@ $ deno test [OPTIONS] [file]
 ```
 
 Some of the test need `--allow-read` to read the sample inputs of its day.
+
+### Create day solution skeleton
+
+New day solutions can be created using the `new` subcommand.
+
+```
+$ deno run -A --unstable src/cli/mod.ts new -h
+
+  Usage:   aoc new
+  Version: 0.1.1
+
+  Description:
+
+    Create new day solution folder skeleton
+
+  Options:
+
+    -h, --help         - Show this help.
+    -d, --day   <day>  - Day of the solution. If omit the corresponding next day will be created.
+```
+
+This command will create a new folder inside the solutions path
+with the following directory structure (see more structure information in [Day Solution structure](#day-solution-structure)):
+
+```
+/ dayX
+├-/ {partOne,partTwo}: Modules of parts one and two
+| ├- mod.ts: Main module of the part solution
+| ...
+├- mod.ts: Main module of the day solution
+```
+
+Once created, you are ready to go to code the new day solution. You may want to download your input file, to do so check the [download command](#download-day-input).
+
+### Download day input
+
+Each day input text file can be download to its day solution folder by the `download` command:
+
+```
+$ deno run -A --unstable src/cli/mod.ts new -h
+
+  Usage:   aoc download
+  Version: 0.1.1       
+
+  Description:
+
+    Download input text file for given day
+
+  Options:
+
+    -h, --help          - Show this help.                                                                     
+    -d, --day    <day>  - Day of the solution. If omit the corresponding next day will be created.  (required)
+    -f, --force         - Force input text file download if already exists one                                
+
+```
+
+If the file already exists it will throw an error unless you use the `--force` option to replace it.
+
+#### Configuration
+
+This command will required to set the required environment variables. You can use either a .env file or setting in your shell session.
+
+| Variable      | Description                                  |  type  |
+| :------------ | :------------------------------------------- | :----: |
+| `AOC_SESSION` | Advent of code session cookie (**required**) | string |
+
+**Disclaimer:** The `AOC_SESSION` is needed to allow Advent of Code website to identify your user and the cli will only use it with that purpose
 
 ### Bundle AOC solutions
 

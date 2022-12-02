@@ -1,8 +1,12 @@
 import { Command } from "https://deno.land/x/cliffy@v0.25.4/command/mod.ts";
+import { config } from "https://deno.land/x/dotenv@v3.2.0/mod.ts";
 import { createDay } from "./create.ts";
+import { download } from "./download.ts";
 import { runAllDays, runDay } from "./run.ts";
 import { Format } from "./types.d.ts";
 import { isFormat } from "./utils.ts";
+
+config({ export: true, allowEmptyValues: true });
 
 try {
   await new Command()
@@ -37,7 +41,7 @@ try {
         )
         .option(
           "--format <format:string>",
-          "Output format.",
+          "Output format. (Available formats: plain, json, csv)",
           {
             default: "plain",
             value(value: string): Format {
@@ -79,7 +83,7 @@ try {
         )
         .option(
           "--format <format:string>",
-          "Output format.",
+          "Output format. (Available formats: plain, json, csv)",
           {
             default: "plain",
             value(value: string): Format {
@@ -103,6 +107,28 @@ try {
           "Day of the solution. If omit the corresponding next day will be created.",
         )
         .action(({ day }) => createDay(day)),
+    )
+    .command(
+      "download",
+      new Command()
+        .description("Download input text file for given day")
+        .env("AOC_SESSION=<value:string>", "Advent of code session cookie", {
+          hidden: true,
+          required: true,
+          global: true,
+        })
+        .option(
+          "-d, --day <day:number>",
+          "Day of the solution. If omit the corresponding next day will be created.",
+          { required: true },
+        )
+        .option(
+          "-f, --force",
+          "Force input text file download if already exists one",
+        )
+        .action(({ day, aocSession, force = false }) =>
+          download(aocSession, day, { force })
+        ),
     )
     .parse(Deno.args);
 } catch (error) {
