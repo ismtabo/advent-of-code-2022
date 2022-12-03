@@ -18,12 +18,12 @@
         "--allow-all",
       ],
       "args": [
-        "download",
-        "-d1",
-        // "-p2",
-        // "--sample",
+        "run",
+        "-d3",
+        "-p2",
+        "--sample",
         // "--file=src/solutions/day10/sample_1.txt"
-        "--force"
+        // "--force"
       ],
       "attachSimplePort": 9229,
       "outputCapture": "std"
