@@ -13,6 +13,9 @@ Create a new repository based on this template to use Deno in your Advent of Cod
 
 You may need to [install deno][3] to use this repository.
 
+Additional dependencies:
+- Deno Create React App: https://deno.land/x/create_react_app@v0.1.2
+
 ### CLI tool
 
 After installing it you can run the solutions using the cli tool:

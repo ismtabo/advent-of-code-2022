@@ -1,0 +1,42 @@
+.App {
+  width: inherit;
+  height: inherit;
+  display: flex;
+  flex-direction: column;
+}
+
+.App header {
+  display: flex;
+}
+
+.App article {
+  justify-self: flex-start;
+  flex-grow: 1;
+}
+
+.copy-left {
+  display: inline-block;
+  text-align: right;
+  margin: 0px;
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+  filter: FlipH;
+  -ms-filter: "FlipH";
+}
+
+.tui-nav {
+  z-index: unset;
+  position: relative;
+}
+
+.App nav.tui-nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+.App footer.tui-nav {
+  display: flex;
+  justify-content: center;
+}

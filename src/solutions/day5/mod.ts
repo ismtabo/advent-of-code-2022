@@ -1,6 +1,32 @@
 import { partOne } from "./partOne/mod.ts";
 import { partTwo } from "./partTwo/mod.ts";
 
+export function validate(text: string): boolean {
+  debugger;
+  const [rawCrates, rawMoves] = text.split("\n\n", 2);
+  if (rawCrates == null || rawCrates === "") {
+    return false;
+  }
+  if (rawMoves == null || rawMoves === "") {
+    return false;
+  }
+  const crates = rawCrates.split("\n");
+  const validateCrates =
+    crates.every((line, _, arr) => line.length === arr.at(0)?.length) &&
+    crates.slice(0, -1).every((line) =>
+      /^(\s{3}|\[[A-Z]\])(\s(\s{3}|\[[A-Z]\]))+$/.test(line)
+    ) &&
+    /^(\s[0-9]\s)( \s[0-9]\s)+$/.test(crates.at(-1)!);
+  if (!validateCrates) {
+    return false;
+  }
+  const moves = rawMoves.trim().split("\n");
+  const validateMoves = moves.every((line) =>
+    /^move \d+ from [0-9] to [0-9]$/.test(line.trim())
+  );
+  return validateMoves;
+}
+
 export function preprocess(text: string) {
   const [rawCrates, rawMoves] = text.split("\n\n", 2);
   const transposeCrates = Array.from(
