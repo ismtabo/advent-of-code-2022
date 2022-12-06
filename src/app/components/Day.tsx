@@ -2,6 +2,8 @@ import { ChangeEvent } from "https://deno.land/std@0.37.0/types/react.d.ts";
 import React from "../deps/react.ts";
 import { useDay } from "../hooks/use-day.ts";
 
+declare var config: { log: boolean; result: any };
+
 export function Day({ day: dayKey }: { day: number }) {
   const dialogRef = React.useRef<HTMLDialogElement>(null);
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
@@ -10,19 +12,21 @@ export function Day({ day: dayKey }: { day: number }) {
   );
   const [input, setInput] = React.useState("");
   const [part, setPart] = React.useState<"part1" | "part2">("part1");
-  const [output, setOutput] = React.useState<
+  const [expectedOutput, setExpectedOutput] = React.useState<
     ReturnType<typeof main> | ""
   >(
     "",
   );
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [testOk, setTestOk] = React.useState<boolean | undefined>(undefined);
   React.useEffect(() => {
     setInput("");
     setPart("part1");
-    setOutput("");
+    setExpectedOutput("");
+    setTestOk(undefined);
   }, [dayKey]);
   function handleInputChange(event: ChangeEvent<HTMLTextAreaElement>) {
-    const target = event.target as unknown as HTMLTextAreaElement;
-    setInput(target.value);
+    setInput(event.target.value);
   }
   function handleScrollInputTop() {
     if (inputRef.current != null) {
@@ -34,8 +38,10 @@ export function Day({ day: dayKey }: { day: number }) {
     setInput("");
   }
   function handlePartChange(event: ChangeEvent<HTMLSelectElement>) {
-    const target = event.target as unknown as HTMLSelectElement;
-    setPart(target.value as any);
+    setPart(event.target.value as any);
+  }
+  function handleOutputChange(event: ChangeEvent<HTMLInputElement>) {
+    setExpectedOutput(event.target.value);
   }
   function handleRun() {
     if (input == null || input === "") {
@@ -45,11 +51,17 @@ export function Day({ day: dayKey }: { day: number }) {
       dialogRef.current?.showModal();
       return;
     }
+    setLoading(true);
     const parsedInput = preprocess(input);
     const output = part === "part1"
       ? partOne(parsedInput as any)
       : partTwo(parsedInput as any);
-    setOutput(output);
+    if (config.log) {
+      console.log(output);
+    }
+    setTestOk(output == expectedOutput);
+    setLoading(false);
+    config.result = output;
   }
   return (
     <>
@@ -152,7 +164,11 @@ export function Day({ day: dayKey }: { day: number }) {
             >
               <legend className="center">Output</legend>
               <div
-                style={{ display: "flex", flexDirection: "column", gap: "1em" }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1em",
+                }}
               >
                 <div className="input-group">
                   <label htmlFor="part">Select Part.....:</label>
@@ -167,19 +183,67 @@ export function Day({ day: dayKey }: { day: number }) {
                   </select>
                 </div>
                 <div className="input-group">
-                  <label htmlFor="output">Output value....:</label>
+                  <label htmlFor="output">Expected output value....:</label>
                   <input
                     name="output"
                     className="tui-input"
                     type="text"
-                    value={output}
-                    disabled
+                    value={expectedOutput}
+                    onChange={handleOutputChange}
+                    required
                   />
                 </div>
+                <div className="input-group">
+                  <label>Test result....:</label>
+                  <span
+                    className={`tui-input${
+                      testOk === true
+                        ? " green-168"
+                        : testOk === false
+                        ? " red-255"
+                        : ""
+                    }`}
+                    style={{ width: 200 }}
+                  >
+                    {testOk === true
+                      ? <>Ok</>
+                      : testOk === false
+                      ? <>Fail</>
+                      : <>...</>}
+                  </span>
+                </div>
+                {config.log
+                  ? (
+                    <div className="input-group">
+                      <label>Test result....:</label>
+                      <span
+                        className={`tui-input${
+                          testOk === true
+                            ? " green-168"
+                            : testOk === false
+                            ? " red-255"
+                            : ""
+                        }`}
+                        style={{ width: 200 }}
+                      >
+                        {testOk === true
+                          ? <>Ok</>
+                          : testOk === false
+                          ? <>Fail</>
+                          : <>...</>}
+                      </span>
+                    </div>
+                  )
+                  : null}
               </div>
               <div className="tui-divider" />
-              <button className="tui-button" type="button" onClick={handleRun}>
-                Run solution
+              <button
+                className="tui-button"
+                type="button"
+                onClick={handleRun}
+                disabled={loading}
+              >
+                {loading ? <>...</> : <>Test output for solution</>}
               </button>
             </fieldset>
           </div>
