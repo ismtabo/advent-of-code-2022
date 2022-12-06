@@ -17,6 +17,7 @@ jobs:
       - run: |
           cd ./src/app
           deno-create-react-app build
+          cp ./robots.txt ./dist/build/
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
