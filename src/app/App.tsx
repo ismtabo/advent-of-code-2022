@@ -11,12 +11,10 @@ function App() {
       <link rel="stylesheet" href="./static/css/App.css" />
       <main className="App">
         <nav className="tui-nav">
+          <a href="#" onClick={() => setSelectedDay(undefined)}>
+            Advent of Code 2022 <i className="glyphicon glyphicon-star"></i>
+          </a>
           <ul>
-            <li className="">
-              <a href="#" onClick={() => setSelectedDay(undefined)}>
-                Advent of Code 2022 <i className="glyphicon glyphicon-star"></i>
-              </a>
-            </li>
             {daysKeys.current.map((day, i) => (
               <li key={day} className={selectedDay === i ? "green-255" : ""}>
                 <a

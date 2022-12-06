@@ -13,16 +13,16 @@ export function Day({ day: dayKey }: { day: number }) {
   const [input, setInput] = React.useState("");
   const [part, setPart] = React.useState<"part1" | "part2">("part1");
   const [expectedOutput, setExpectedOutput] = React.useState<
-    ReturnType<typeof main> | ""
+    string | undefined
   >(
-    "",
+    undefined,
   );
   const [loading, setLoading] = React.useState<boolean>(false);
   const [testOk, setTestOk] = React.useState<boolean | undefined>(undefined);
   React.useEffect(() => {
     setInput("");
     setPart("part1");
-    setExpectedOutput("");
+    setExpectedOutput(undefined);
     setTestOk(undefined);
   }, [dayKey]);
   function handleInputChange(event: ChangeEvent<HTMLTextAreaElement>) {
@@ -59,36 +59,58 @@ export function Day({ day: dayKey }: { day: number }) {
     if (config.log) {
       console.log(output);
     }
-    setTestOk(output == expectedOutput);
+    if (expectedOutput != null) {
+      setTestOk(output == expectedOutput);
+    } else {
+      setTestOk(undefined);
+    }
     setLoading(false);
     config.result = output;
   }
   return (
     <>
       <style>
-        {`.main {
-          width: 100%;
+        {`
+        .main {
           height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
+          width: 100%;
+        }
+
+        .problem-container {
+          height: 100%;
+          width: 100%;
+          display: grid;
+          grid-template-rows: fit-content;
+          grid-template-areas: 'description' 'output' 'input';
+          overflow: auto;
+        }
+
+        @media (min-width: 1000px) {
+          .problem-container {
+            grid-template-rows: unset;
+            grid-template-columns: 1.5fr 1fr;
+            grid-template-areas: 'input description' 'input output';
+          }
+        }
+
+        .problem-container .tui-window {
+          box-shadow: unset;
         }
 
         .input-group {
           display: flex;
           justify-content: space-between;
-        }`}
+        }
+        
+        @media (max-width: 420px) {
+          .input-group {
+            flex-direction: column;
+          }
+        }
+        `}
       </style>
       <div className="main">
-        <div
-          style={{
-            height: "100%",
-            width: "100%",
-            display: "grid",
-            gridTemplateColumns: "1.5fr 1fr",
-            gridTemplateAreas: "'input description' 'input output'",
-          }}
-        >
+        <div className="problem-container">
           <div
             className="tui-window"
             style={{ height: "100%", width: "100%", gridArea: "input" }}
@@ -102,11 +124,12 @@ export function Day({ day: dayKey }: { day: number }) {
                 ref={inputRef}
                 className="tui-textarea"
                 rows={4}
-                style={{ height: "100%", width: "100%" }}
+                style={{ height: "100%", width: "100%", resize: "none" }}
                 placeholder="..."
                 value={input}
                 onChange={handleInputChange}
                 onPaste={handleScrollInputTop}
+                spellCheck={false}
               >
               </textarea>
               <div
@@ -148,12 +171,13 @@ export function Day({ day: dayKey }: { day: number }) {
               }}
             >
               <legend className="center">Description</legend>
-              <p>This is the day {dayKey + 1}</p>
+              <p>This is the solution for day {dayKey + 1}</p>
               <a
                 className="tui-button cyan-255"
+                target="_blank"
                 href={`https://adventofcode.com/2022/day/${dayKey + 1}`}
               >
-                Day problem doc
+                Advent of Code day page
               </a>
             </fieldset>
           </div>
@@ -184,7 +208,7 @@ export function Day({ day: dayKey }: { day: number }) {
                 }}
               >
                 <div className="input-group">
-                  <label htmlFor="part">Select Part.....:</label>
+                  <label htmlFor="part">Select Part..............:</label>
                   <select
                     name="part"
                     className="tui-input"
@@ -207,7 +231,7 @@ export function Day({ day: dayKey }: { day: number }) {
                   />
                 </div>
                 <div className="input-group">
-                  <label>Test result....:</label>
+                  <label>Test result..............:</label>
                   <span
                     className={`tui-input${
                       testOk === true
@@ -261,29 +285,29 @@ export function Day({ day: dayKey }: { day: number }) {
             </fieldset>
           </div>
         </div>
-      </div>
-      <dialog ref={dialogRef} className="tui-window red-168">
-        <fieldset className="tui-fieldset">
-          <legend className="red-255 yellow-255-text">Alert</legend>
-          <h3>Invalid input.</h3>
-          <p>
-            For more information read{" "}
-            <a
-              href={`https://adventofcode.com/2022/day/${dayKey + 1}`}
-              className="blue-255-text cyan-168-text-hover"
+        <dialog ref={dialogRef} className="tui-window red-168">
+          <fieldset className="tui-fieldset">
+            <legend className="red-255 yellow-255-text">Alert</legend>
+            <h3>Invalid input.</h3>
+            <p>
+              For more information read{" "}
+              <a
+                href={`https://adventofcode.com/2022/day/${dayKey + 1}`}
+                className="blue-255-text cyan-168-text-hover"
+              >
+                day {dayKey + 1} page
+              </a>.
+            </p>
+            <button
+              className="tui-button tui-modal-close-button right"
+              data-modal="modal"
+              onClick={() => dialogRef.current?.close()}
             >
-              day {dayKey + 1} page
-            </a>.
-          </p>
-          <button
-            className="tui-button tui-modal-close-button right"
-            data-modal="modal"
-            onClick={() => dialogRef.current?.close()}
-          >
-            close
-          </button>
-        </fieldset>
-      </dialog>
+              close
+            </button>
+          </fieldset>
+        </dialog>
+      </div>
     </>
   );
 }

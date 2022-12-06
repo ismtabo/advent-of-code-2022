@@ -1,6 +1,6 @@
 export function getStarterMarker(
   input: string,
-  markerLength: number = 4,
+  markerLength = 4,
 ): number {
   const starterMarker = Array.from(input).reduce((acc, val) => {
     if (new Set(acc).size !== acc.length) {

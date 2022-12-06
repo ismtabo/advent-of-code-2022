@@ -29,6 +29,7 @@ export function Welcome() {
             <p>
               <a
                 href="https://adventofcode.com/2022"
+                target="_blank"
                 className="tui-button"
               >
                 Learn More

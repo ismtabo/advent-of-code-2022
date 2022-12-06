@@ -12,6 +12,7 @@
 .App article {
   justify-self: flex-start;
   flex-grow: 1;
+  overflow: hidden;
 }
 
 .copy-left {
@@ -33,7 +34,17 @@
 
 .App nav.tui-nav {
   display: flex;
-  justify-content: space-between;
+}
+
+.App nav.tui-nav span:last-child {
+  flex-grow: 1;
+  text-align: end;
+}
+
+@media (max-width: 720px) {
+  .App nav.tui-nav span:last-child {
+    display: none;
+  }
 }
 
 .App footer.tui-nav {
