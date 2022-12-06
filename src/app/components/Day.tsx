@@ -65,7 +65,20 @@ export function Day({ day: dayKey }: { day: number }) {
   }
   return (
     <>
-      <link rel="stylesheet" href="./static/css/Day.css" />
+      <style>
+        {`.main {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .input-group {
+          display: flex;
+          justify-content: space-between;
+        }`}
+      </style>
       <div className="main">
         <div
           style={{
