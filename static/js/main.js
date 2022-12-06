@@ -6125,26 +6125,162 @@ const mod6 = {
     day5: mod4,
     day6: mod5
 };
-function Welcome() {
+const today = new Date();
+function isToday(dirtyDate) {
+    const date = new Date(dirtyDate);
+    return date.toDateString() === today.toDateString();
+}
+function Calendar({ day , onDaySelected , style  }) {
+    const beginOfMonth = new Date("2022/12/01");
+    const dowEndOfMonth = beginOfMonth.getDay();
+    return Me1.createElement("fieldset", {
+        className: "tui-fieldset blue-168 white-255-text",
+        style: {
+            height: "inherit",
+            width: "inherit",
+            ...style
+        }
+    }, Me1.createElement("legend", {
+        className: "center"
+    }, "Advent Calendar"), Me1.createElement("div", {
+        style: {
+            height: "100%",
+            width: "100%",
+            display: "grid",
+            gridTemplateRows: "fit-content repeat(5, 1fr)",
+            gridTemplateColumns: "repeat(7, 1fr)",
+            justifyContent: "space-between",
+            alignItems: "space-between"
+        }
+    }, Me1.createElement("div", {
+        style: {
+            fontSize: ".75em",
+            textAlign: "center"
+        }
+    }, "Mon"), Me1.createElement("div", {
+        style: {
+            fontSize: ".75em",
+            textAlign: "center"
+        }
+    }, "Tue"), Me1.createElement("div", {
+        style: {
+            fontSize: ".75em",
+            textAlign: "center"
+        }
+    }, "Wed"), Me1.createElement("div", {
+        style: {
+            fontSize: ".75em",
+            textAlign: "center"
+        }
+    }, "Thu"), Me1.createElement("div", {
+        style: {
+            fontSize: ".75em",
+            textAlign: "center"
+        }
+    }, "Fri"), Me1.createElement("div", {
+        style: {
+            fontSize: ".75em",
+            textAlign: "center"
+        }
+    }, "Sat"), Me1.createElement("div", {
+        style: {
+            fontSize: ".75em",
+            textAlign: "center"
+        }
+    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod6 ? Me1.createElement("div", {
+            className: `cursor-pointer ${day === i ? "green-255 blue-168-text disable" : isToday(new Date(`2022/12/${i + 1}`)) ? "yellow-255 blue-168-text" : i === 24 ? "red-255" : "yellow-255-text"}`,
+            style: {
+                textAlign: "end"
+            },
+            onClick: ()=>onDaySelected(i)
+        }, i + 1) : Me1.createElement("div", {
+            className: `white-168-text${i === 24 ? " red-168 black-255-text" : ""}`,
+            style: {
+                textAlign: "end"
+            }
+        }, i + 1))));
+}
+function ChristmasTree({ height  }) {
+    const tree = [];
+    for(let i = 0; i < height; i++){
+        let line = Array.from(" ".repeat(height - (i + 1)));
+        line = line.concat(Array.from("*".repeat(i * 2 + 1)));
+        line = line.concat(Array.from(" ".repeat(height - (i + 1))));
+        tree.push(line);
+    }
+    const line1 = Array.from(" ".repeat(height * 2 - 1));
+    line1.splice(height - 1, 1, "#");
+    tree.push(line1);
+    tree.push(line1);
+    return Me1.createElement("div", {
+        style: {
+            display: "grid",
+            gridTemplateColumns: `repeat(${height * 2 - 1}, 1fr)`,
+            gridTemplateRows: `repeat(${height + 2}, 1fr)`
+        }
+    }, tree.flatMap((line)=>Array.from(line)).map((item, i)=>Me1.createElement("div", {
+            className: item === "*" ? i < height * 2 - 1 ? `yellow-255-text` : Math.random() < 0.2 ? `red-255-text` : `green-168-text` : item === "#" ? `orange-168-text` : ""
+        }, item)));
+}
+function Welcome({ onDaySelected  }) {
     return Me1.createElement(Me1.Fragment, null, Me1.createElement("style", null, `.main {
           width: 100%;
           height: 100%;
           display: flex;
           justify-content: center;
           align-items: center;
-        }`), Me1.createElement("div", {
+          flex-direction: column;
+          gap: 2em;
+        }
+        [data-christmas-tree] {
+          display: none;
+        }
+        @media (min-width: 950px) {
+          [data-christmas-tree] {
+            display: inherit;
+          }
+        }
+        `), Me1.createElement("div", {
         className: "main"
     }, Me1.createElement("div", {
-        className: "tui-panel center-align black-255-text"
+        "data-message": true,
+        className: "tui-panel black-255-text"
     }, Me1.createElement("div", {
         className: "tui-panel-header white-168"
-    }, Me1.createElement("h1", null, "Welcome to Advent of Code 2022")), Me1.createElement("div", {
+    }, Me1.createElement("p", null, Me1.createElement("span", {
+        className: "yellow-255-text"
+    }, "*"), " ", "Welcome to Advent of Code 2022", " ", Me1.createElement("span", {
+        className: "yellow-255-text"
+    }, "*"))), Me1.createElement("div", {
         className: "tui-panel-content white-255-text"
-    }, Me1.createElement("h2", null, "This page contains an interactive web application with the solutions of AoC of this year"), Me1.createElement("p", null, "To start testing the solutions just select a day in the nav bar and run with your input."), Me1.createElement("p", null, Me1.createElement("a", {
+    }, Me1.createElement("p", null, "This page contains an interactive web application with the solutions of AoC of this year"), Me1.createElement("p", null, "To start testing the solutions just select a day in the nav bar and run with your input."), Me1.createElement("p", {
+        className: "center",
+        style: {
+            marginTop: "1em"
+        }
+    }, Me1.createElement("a", {
         href: "https://adventofcode.com/2022",
         target: "_blank",
-        className: "tui-button"
-    }, "Learn More"))))));
+        className: "tui-button white-255-text"
+    }, "Learn More 🕭")))), Me1.createElement("div", {
+        "data-footer": true,
+        style: {
+            display: "flex",
+            gap: "2em",
+            height: "fit-content"
+        }
+    }, Me1.createElement("span", {
+        "data-christmas-tree": true
+    }, Me1.createElement(ChristmasTree, {
+        "data-christmas-tree": true,
+        height: 12
+    })), Me1.createElement(Calendar, {
+        style: {
+            height: "15em",
+            width: "15em"
+        },
+        onDaySelected: onDaySelected
+    }))));
 }
 function useDay(dayKey) {
     return Me1.useMemo(()=>{
@@ -6153,7 +6289,20 @@ function useDay(dayKey) {
         dayKey
     ]);
 }
-function Day({ day: dayKey  }) {
+function ColoredCaps({ children  }) {
+    const elements = Array.isArray(children) ? children : [
+        children
+    ];
+    return Me1.createElement(Me1.Fragment, null, elements.flat().map((element)=>typeof element === "string" ? Array.from(element).map((__char, i)=>{
+            if (/[A-Z]/.test(__char)) {
+                return Me1.createElement("span", {
+                    className: "red-255-text"
+                }, __char);
+            }
+            return Me1.createElement(Me1.Fragment, null, __char);
+        }) : element));
+}
+function Day({ day: dayKey , onDaySelected  }) {
     const dialogRef = Me1.useRef(null);
     const inputRef = Me1.useRef(null);
     const { validate , preprocess , partOne , partTwo , main  } = useDay(dayKey);
@@ -6223,16 +6372,25 @@ function Day({ day: dayKey  }) {
           height: 100%;
           width: 100%;
           display: grid;
-          grid-template-rows: fit-content;
-          grid-template-areas: 'description' 'output' 'input';
+          grid-template-rows: min-content 1.25fr 1fr;
+          grid-template-areas: 'info' 'input' 'output';
           overflow: auto;
+        }
+        [data-calendar] {
+          display: none;
         }
 
         @media (min-width: 1000px) {
           .problem-container {
             grid-template-rows: unset;
             grid-template-columns: 1.5fr 1fr;
-            grid-template-areas: 'input description' 'input output';
+            grid-template-areas: 'input calendar' 'input output';
+          }
+          [data-info] {
+            display: none;
+          }
+          [data-calendar] {
+            display: inherit;
           }
         }
 
@@ -6255,6 +6413,14 @@ function Day({ day: dayKey  }) {
     }, Me1.createElement("div", {
         className: "problem-container"
     }, Me1.createElement("div", {
+        "data-info": true,
+        className: "center blue-168 white-255-text",
+        style: {
+            gridArea: "info",
+            padding: "0.25em"
+        }
+    }, Me1.createElement(ColoredCaps, null, "Day ", dayKey + 1)), Me1.createElement("div", {
+        "data-input": true,
         className: "tui-window",
         style: {
             height: "100%",
@@ -6298,28 +6464,18 @@ function Day({ day: dayKey  }) {
         className: "tui-button red-168",
         onClick: handleInputClear
     }, "Clear")))), Me1.createElement("div", {
+        "data-calendar": true,
         className: "tui-window",
         style: {
             height: "100%",
             width: "100%",
-            gridArea: "description"
+            gridArea: "calendar"
         }
-    }, Me1.createElement("fieldset", {
-        className: "tui-fieldset",
-        style: {
-            height: "inherit",
-            width: "inherit",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between"
-        }
-    }, Me1.createElement("legend", {
-        className: "center"
-    }, "Description"), Me1.createElement("p", null, "This is the solution for day ", dayKey + 1), Me1.createElement("a", {
-        className: "tui-button cyan-255",
-        target: "_blank",
-        href: `https://adventofcode.com/2022/day/${dayKey + 1}`
-    }, "Advent of Code day page"))), Me1.createElement("div", {
+    }, Me1.createElement(Calendar, {
+        day: dayKey,
+        onDaySelected: onDaySelected
+    })), Me1.createElement("div", {
+        "data-output": true,
         className: "tui-window",
         style: {
             height: "100%",
@@ -6388,7 +6544,11 @@ function Day({ day: dayKey  }) {
         type: "button",
         onClick: handleRun,
         disabled: loading
-    }, loading ? Me1.createElement(Me1.Fragment, null, "...") : Me1.createElement(Me1.Fragment, null, "Test output for solution"))))), Me1.createElement("dialog", {
+    }, loading ? Me1.createElement(Me1.Fragment, null, "...") : Me1.createElement(Me1.Fragment, null, "Test output for solution")), Me1.createElement("a", {
+        className: "tui-button cyan-255",
+        target: "_blank",
+        href: `https://adventofcode.com/2022/day/${dayKey + 1}`
+    }, "Advent of Code day page")))), Me1.createElement("dialog", {
         ref: dialogRef,
         className: "tui-window red-168"
     }, Me1.createElement("fieldset", {
@@ -6404,8 +6564,72 @@ function Day({ day: dayKey  }) {
         onClick: ()=>dialogRef.current?.close()
     }, "close")))));
 }
-function App() {
+function useWidth(el) {
+    const observer = Me1.useRef();
+    const [rect, setContentRect] = Me1.useState(el.current?.getBoundingClientRect());
+    function updateBoundingClient(why) {
+        return ()=>{
+            console.log(`updating rect [why=${why}]`);
+            setContentRect(el.current?.getBoundingClientRect());
+        };
+    }
+    Me1.useEffect(()=>updateBoundingClient("deps"), [
+        el.current
+    ]);
+    Me1.useEffect(()=>{
+        observer.current = new ResizeObserver((observers)=>{
+            observers.forEach(updateBoundingClient("observer"));
+        });
+        observer.current.observe(el.current ?? document.body);
+        return ()=>{
+            observer.current?.disconnect();
+        };
+    }, []);
+    return Me1.useMemo(()=>rect?.width, [
+        rect
+    ]);
+}
+function DaySelector({ selectedDay , onDayChange  }) {
+    const el = Me1.useRef(null);
+    const width = useWidth(el);
+    if (width != null && width > 1000) {
+        return Me1.createElement("span", {
+            ref: el
+        }, Me1.createElement(DaysList, {
+            selectedDay: selectedDay,
+            onDayChange: onDayChange
+        }), ";");
+    }
+    return Me1.createElement("span", {
+        ref: el
+    }, Me1.createElement("li", {
+        className: "tui-dropdown"
+    }, Me1.createElement("span", {
+        style: {
+            textAlign: "end"
+        }
+    }, Me1.createElement(ColoredCaps, null, "Days", Me1.createElement("span", {
+        style: {
+            fontSize: "small"
+        }
+    }, "⏷"))), Me1.createElement("div", {
+        className: "tui-dropdown-content"
+    }, Me1.createElement(DaysList, {
+        selectedDay: selectedDay,
+        onDayChange: onDayChange
+    }))));
+}
+function DaysList({ selectedDay , onDayChange  }) {
     const daysKeys = Me1.useRef(Object.keys(mod6));
+    return Me1.createElement("ul", null, daysKeys.current.map((day, i)=>Me1.createElement("li", {
+            key: day,
+            className: selectedDay === i ? "green-255" : ""
+        }, Me1.createElement("a", {
+            href: "#",
+            onClick: ()=>onDayChange(i)
+        }, Me1.createElement(ColoredCaps, null, "Day ", i + 1)))));
+}
+function App() {
     const [selectedDay, setSelectedDay] = Me1.useState();
     return Me1.createElement(Me1.Fragment, null, Me1.createElement("link", {
         rel: "stylesheet",
@@ -6414,22 +6638,20 @@ function App() {
         className: "App"
     }, Me1.createElement("nav", {
         className: "tui-nav"
-    }, Me1.createElement("a", {
+    }, Me1.createElement("span", null, Me1.createElement("a", {
         href: "#",
         onClick: ()=>setSelectedDay(undefined)
-    }, "Advent of Code 2022 ", Me1.createElement("i", {
-        className: "glyphicon glyphicon-star"
-    })), Me1.createElement("ul", null, daysKeys.current.map((day, i)=>Me1.createElement("li", {
-            key: day,
-            className: selectedDay === i ? "green-255" : ""
-        }, Me1.createElement("a", {
-            href: "#",
-            onClick: ()=>setSelectedDay(i)
-        }, "Day ", i + 1)))), Me1.createElement("span", {
+    }, Me1.createElement(ColoredCaps, null, "Advent of Code 2022"))), Me1.createElement(DaySelector, {
+        selectedDay: selectedDay,
+        onDayChange: (day)=>setSelectedDay(day)
+    }), Me1.createElement("span", {
         className: "tui-datetime",
         "data-format": "h:m:s a"
-    })), Me1.createElement("article", null, selectedDay == null ? Me1.createElement(Welcome, null) : Me1.createElement(Day, {
-        day: selectedDay
+    })), Me1.createElement("article", null, selectedDay == null ? Me1.createElement(Welcome, {
+        onDaySelected: (day)=>setSelectedDay(day)
+    }) : Me1.createElement(Day, {
+        day: selectedDay,
+        onDaySelected: (day)=>setSelectedDay(day)
     })), Me1.createElement("footer", {
         className: "tui-nav"
     }, Me1.createElement("span", {

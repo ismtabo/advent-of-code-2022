@@ -34,15 +34,24 @@
 
 .App nav.tui-nav {
   display: flex;
+  gap: 1em;
 }
 
-.App nav.tui-nav span:last-child {
+.App nav.tui-nav > span:last-child {
   flex-grow: 1;
   text-align: end;
 }
 
+@media (max-width: 300px) {
+  .App nav.tui-nav {
+    flex-direction: column;
+    gap: inherit;
+    margin-bottom: 0.5em;
+  }
+}
+
 @media (max-width: 720px) {
-  .App nav.tui-nav span:last-child {
+  .App nav.tui-nav > span:last-child {
     display: none;
   }
 }
