@@ -6126,10 +6126,13 @@ const mod6 = {
     day6: mod5
 };
 function Welcome() {
-    return Me1.createElement(Me1.Fragment, null, Me1.createElement("link", {
-        rel: "stylesheet",
-        href: "./static/css/Welcome.css"
-    }), Me1.createElement("div", {
+    return Me1.createElement(Me1.Fragment, null, Me1.createElement("style", null, `.main {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }`), Me1.createElement("div", {
         className: "main"
     }, Me1.createElement("div", {
         className: "tui-panel center-align black-255-text"
@@ -6205,10 +6208,18 @@ function Day({ day: dayKey  }) {
         setLoading(false);
         config.result = output;
     }
-    return Me1.createElement(Me1.Fragment, null, Me1.createElement("link", {
-        rel: "stylesheet",
-        href: "./static/css/Day.css"
-    }), Me1.createElement("div", {
+    return Me1.createElement(Me1.Fragment, null, Me1.createElement("style", null, `.main {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .input-group {
+          display: flex;
+          justify-content: space-between;
+        }`), Me1.createElement("div", {
         className: "main"
     }, Me1.createElement("div", {
         style: {
