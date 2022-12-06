@@ -1,36 +1,36 @@
-import * as solutions from "../solutions/mod.ts";
 import React from "./deps/react.ts";
 import { Welcome } from "./components/Welcome.tsx";
 import { Day } from "./components/Day.tsx";
+import { DaySelector } from "./components/DaySelector.tsx";
+import { ColoredCaps } from "./components/ColoredCaps.tsx";
 
 function App() {
-  const daysKeys = React.useRef(Object.keys(solutions));
   const [selectedDay, setSelectedDay] = React.useState<number | undefined>();
   return (
     <>
       <link rel="stylesheet" href="./static/css/App.css" />
       <main className="App">
         <nav className="tui-nav">
-          <a href="#" onClick={() => setSelectedDay(undefined)}>
-            Advent of Code 2022 <i className="glyphicon glyphicon-star"></i>
-          </a>
-          <ul>
-            {daysKeys.current.map((day, i) => (
-              <li key={day} className={selectedDay === i ? "green-255" : ""}>
-                <a
-                  href="#"
-                  onClick={() =>
-                    setSelectedDay(i)}
-                >
-                  Day {i + 1}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <span>
+            <a href="#" onClick={() => setSelectedDay(undefined)}>
+              <ColoredCaps>Advent of Code 2022</ColoredCaps>
+            </a>
+          </span>
+          <DaySelector
+            selectedDay={selectedDay}
+            onDayChange={(day) => setSelectedDay(day)}
+          />
           <span className="tui-datetime" data-format="h:m:s a"></span>
         </nav>
         <article>
-          {selectedDay == null ? <Welcome /> : <Day day={selectedDay} />}
+          {selectedDay == null
+            ? <Welcome onDaySelected={(day) => setSelectedDay(day)} />
+            : (
+              <Day
+                day={selectedDay}
+                onDaySelected={(day) => setSelectedDay(day)}
+              />
+            )}
         </article>
         <footer className="tui-nav">
           <span className="copy-left">©</span> Ismael Taboada, 2022

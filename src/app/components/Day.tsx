@@ -1,10 +1,17 @@
 import { ChangeEvent } from "https://deno.land/std@0.37.0/types/react.d.ts";
 import React from "../deps/react.ts";
 import { useDay } from "../hooks/use-day.ts";
+import { Calendar } from "./Calendar.tsx";
+import { ColoredCaps } from "./ColoredCaps.tsx";
 
 declare var config: { log: boolean; result: any };
 
-export function Day({ day: dayKey }: { day: number }) {
+interface DayProps {
+  day: number;
+  onDaySelected: (day: number) => void;
+}
+
+export function Day({ day: dayKey, onDaySelected }: DayProps) {
   const dialogRef = React.useRef<HTMLDialogElement>(null);
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const { validate, preprocess, partOne, partTwo, main } = useDay(
@@ -80,16 +87,25 @@ export function Day({ day: dayKey }: { day: number }) {
           height: 100%;
           width: 100%;
           display: grid;
-          grid-template-rows: fit-content;
-          grid-template-areas: 'description' 'output' 'input';
+          grid-template-rows: min-content 1.25fr 1fr;
+          grid-template-areas: 'info' 'input' 'output';
           overflow: auto;
+        }
+        [data-calendar] {
+          display: none;
         }
 
         @media (min-width: 1000px) {
           .problem-container {
             grid-template-rows: unset;
             grid-template-columns: 1.5fr 1fr;
-            grid-template-areas: 'input description' 'input output';
+            grid-template-areas: 'input calendar' 'input output';
+          }
+          [data-info] {
+            display: none;
+          }
+          [data-calendar] {
+            display: inherit;
           }
         }
 
@@ -112,6 +128,16 @@ export function Day({ day: dayKey }: { day: number }) {
       <div className="main">
         <div className="problem-container">
           <div
+            data-info
+            className="center blue-168 white-255-text"
+            style={{ gridArea: "info", padding: "0.25em" }}
+          >
+            <ColoredCaps>
+              Day {dayKey + 1}
+            </ColoredCaps>
+          </div>
+          <div
+            data-input
             className="tui-window"
             style={{ height: "100%", width: "100%", gridArea: "input" }}
           >
@@ -157,31 +183,14 @@ export function Day({ day: dayKey }: { day: number }) {
             </fieldset>
           </div>
           <div
+            data-calendar
             className="tui-window"
-            style={{ height: "100%", width: "100%", gridArea: "description" }}
+            style={{ height: "100%", width: "100%", gridArea: "calendar" }}
           >
-            <fieldset
-              className="tui-fieldset"
-              style={{
-                height: "inherit",
-                width: "inherit",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-              }}
-            >
-              <legend className="center">Description</legend>
-              <p>This is the solution for day {dayKey + 1}</p>
-              <a
-                className="tui-button cyan-255"
-                target="_blank"
-                href={`https://adventofcode.com/2022/day/${dayKey + 1}`}
-              >
-                Advent of Code day page
-              </a>
-            </fieldset>
+            <Calendar day={dayKey} onDaySelected={onDaySelected} />
           </div>
           <div
+            data-output
             className="tui-window"
             style={{
               height: "100%",
@@ -282,6 +291,13 @@ export function Day({ day: dayKey }: { day: number }) {
               >
                 {loading ? <>...</> : <>Test output for solution</>}
               </button>
+              <a
+                className="tui-button cyan-255"
+                target="_blank"
+                href={`https://adventofcode.com/2022/day/${dayKey + 1}`}
+              >
+                Advent of Code day page
+              </a>
             </fieldset>
           </div>
         </div>
