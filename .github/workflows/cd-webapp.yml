@@ -1,0 +1,24 @@
+name: Build and Deploy web app
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - run: |
+          deno install -A --unstable -n deno-create-react-app https://deno.land/x/create_react_app/mod.ts
+      - run: |
+          cd ./src/app
+          deno-create-react-app build
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        with:
+          branch: gh-pages
+          folder: src/app/dist/build
