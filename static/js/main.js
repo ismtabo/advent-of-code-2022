@@ -6128,7 +6128,7 @@ const mod6 = {
 function Welcome() {
     return Me1.createElement(Me1.Fragment, null, Me1.createElement("link", {
         rel: "stylesheet",
-        href: "../static/css/Welcome.css"
+        href: "./static/css/Welcome.css"
     }), Me1.createElement("div", {
         className: "main"
     }, Me1.createElement("div", {
@@ -6207,7 +6207,7 @@ function Day({ day: dayKey  }) {
     }
     return Me1.createElement(Me1.Fragment, null, Me1.createElement("link", {
         rel: "stylesheet",
-        href: "../static/css/Day.css"
+        href: "./static/css/Day.css"
     }), Me1.createElement("div", {
         className: "main"
     }, Me1.createElement("div", {
