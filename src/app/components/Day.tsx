@@ -65,7 +65,7 @@ export function Day({ day: dayKey }: { day: number }) {
   }
   return (
     <>
-      <link rel="stylesheet" href="../static/css/Day.css" />
+      <link rel="stylesheet" href="./static/css/Day.css" />
       <div className="main">
         <div
           style={{

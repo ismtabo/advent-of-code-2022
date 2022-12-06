@@ -3,7 +3,7 @@ import React from "../deps/react.ts";
 export function Welcome() {
   return (
     <>
-      <link rel="stylesheet" href="../static/css/Welcome.css" />
+      <link rel="stylesheet" href="./static/css/Welcome.css" />
       <div className="main">
         <div className="tui-panel center-align black-255-text">
           <div className="tui-panel-header white-168">
