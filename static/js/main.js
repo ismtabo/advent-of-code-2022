@@ -6142,6 +6142,7 @@ function Welcome() {
         className: "tui-panel-content white-255-text"
     }, Me1.createElement("h2", null, "This page contains an interactive web application with the solutions of AoC of this year"), Me1.createElement("p", null, "To start testing the solutions just select a day in the nav bar and run with your input."), Me1.createElement("p", null, Me1.createElement("a", {
         href: "https://adventofcode.com/2022",
+        target: "_blank",
         className: "tui-button"
     }, "Learn More"))))));
 }
@@ -6158,13 +6159,13 @@ function Day({ day: dayKey  }) {
     const { validate , preprocess , partOne , partTwo , main  } = useDay(dayKey);
     const [input, setInput] = Me1.useState("");
     const [part, setPart] = Me1.useState("part1");
-    const [expectedOutput, setExpectedOutput] = Me1.useState("");
+    const [expectedOutput, setExpectedOutput] = Me1.useState(undefined);
     const [loading, setLoading] = Me1.useState(false);
     const [testOk, setTestOk] = Me1.useState(undefined);
     Me1.useEffect(()=>{
         setInput("");
         setPart("part1");
-        setExpectedOutput("");
+        setExpectedOutput(undefined);
         setTestOk(undefined);
     }, [
         dayKey
@@ -6204,31 +6205,55 @@ function Day({ day: dayKey  }) {
         if (config.log) {
             console.log(output);
         }
-        setTestOk(output == expectedOutput);
+        if (expectedOutput != null) {
+            setTestOk(output == expectedOutput);
+        } else {
+            setTestOk(undefined);
+        }
         setLoading(false);
         config.result = output;
     }
-    return Me1.createElement(Me1.Fragment, null, Me1.createElement("style", null, `.main {
-          width: 100%;
+    return Me1.createElement(Me1.Fragment, null, Me1.createElement("style", null, `
+        .main {
           height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
+          width: 100%;
+        }
+
+        .problem-container {
+          height: 100%;
+          width: 100%;
+          display: grid;
+          grid-template-rows: fit-content;
+          grid-template-areas: 'description' 'output' 'input';
+          overflow: auto;
+        }
+
+        @media (min-width: 1000px) {
+          .problem-container {
+            grid-template-rows: unset;
+            grid-template-columns: 1.5fr 1fr;
+            grid-template-areas: 'input description' 'input output';
+          }
+        }
+
+        .problem-container .tui-window {
+          box-shadow: unset;
         }
 
         .input-group {
           display: flex;
           justify-content: space-between;
-        }`), Me1.createElement("div", {
+        }
+        
+        @media (max-width: 420px) {
+          .input-group {
+            flex-direction: column;
+          }
+        }
+        `), Me1.createElement("div", {
         className: "main"
     }, Me1.createElement("div", {
-        style: {
-            height: "100%",
-            width: "100%",
-            display: "grid",
-            gridTemplateColumns: "1.5fr 1fr",
-            gridTemplateAreas: "'input description' 'input output'"
-        }
+        className: "problem-container"
     }, Me1.createElement("div", {
         className: "tui-window",
         style: {
@@ -6250,12 +6275,14 @@ function Day({ day: dayKey  }) {
         rows: 4,
         style: {
             height: "100%",
-            width: "100%"
+            width: "100%",
+            resize: "none"
         },
         placeholder: "...",
         value: input,
         onChange: handleInputChange,
-        onPaste: handleScrollInputTop
+        onPaste: handleScrollInputTop,
+        spellCheck: false
     }), Me1.createElement("div", {
         style: {
             position: "absolute",
@@ -6288,10 +6315,11 @@ function Day({ day: dayKey  }) {
         }
     }, Me1.createElement("legend", {
         className: "center"
-    }, "Description"), Me1.createElement("p", null, "This is the day ", dayKey + 1), Me1.createElement("a", {
+    }, "Description"), Me1.createElement("p", null, "This is the solution for day ", dayKey + 1), Me1.createElement("a", {
         className: "tui-button cyan-255",
+        target: "_blank",
         href: `https://adventofcode.com/2022/day/${dayKey + 1}`
-    }, "Day problem doc"))), Me1.createElement("div", {
+    }, "Advent of Code day page"))), Me1.createElement("div", {
         className: "tui-window",
         style: {
             height: "100%",
@@ -6319,7 +6347,7 @@ function Day({ day: dayKey  }) {
         className: "input-group"
     }, Me1.createElement("label", {
         htmlFor: "part"
-    }, "Select Part.....:"), Me1.createElement("select", {
+    }, "Select Part..............:"), Me1.createElement("select", {
         name: "part",
         className: "tui-input",
         value: part,
@@ -6341,7 +6369,7 @@ function Day({ day: dayKey  }) {
         required: true
     })), Me1.createElement("div", {
         className: "input-group"
-    }, Me1.createElement("label", null, "Test result....:"), Me1.createElement("span", {
+    }, Me1.createElement("label", null, "Test result..............:"), Me1.createElement("span", {
         className: `tui-input${testOk === true ? " green-168" : testOk === false ? " red-255" : ""}`,
         style: {
             width: 200
@@ -6360,7 +6388,7 @@ function Day({ day: dayKey  }) {
         type: "button",
         onClick: handleRun,
         disabled: loading
-    }, loading ? Me1.createElement(Me1.Fragment, null, "...") : Me1.createElement(Me1.Fragment, null, "Test output for solution")))))), Me1.createElement("dialog", {
+    }, loading ? Me1.createElement(Me1.Fragment, null, "...") : Me1.createElement(Me1.Fragment, null, "Test output for solution"))))), Me1.createElement("dialog", {
         ref: dialogRef,
         className: "tui-window red-168"
     }, Me1.createElement("fieldset", {
@@ -6374,7 +6402,7 @@ function Day({ day: dayKey  }) {
         className: "tui-button tui-modal-close-button right",
         "data-modal": "modal",
         onClick: ()=>dialogRef.current?.close()
-    }, "close"))));
+    }, "close")))));
 }
 function App() {
     const daysKeys = Me1.useRef(Object.keys(mod6));
@@ -6386,14 +6414,12 @@ function App() {
         className: "App"
     }, Me1.createElement("nav", {
         className: "tui-nav"
-    }, Me1.createElement("ul", null, Me1.createElement("li", {
-        className: ""
     }, Me1.createElement("a", {
         href: "#",
         onClick: ()=>setSelectedDay(undefined)
     }, "Advent of Code 2022 ", Me1.createElement("i", {
         className: "glyphicon glyphicon-star"
-    }))), daysKeys.current.map((day, i)=>Me1.createElement("li", {
+    })), Me1.createElement("ul", null, daysKeys.current.map((day, i)=>Me1.createElement("li", {
             key: day,
             className: selectedDay === i ? "green-255" : ""
         }, Me1.createElement("a", {
