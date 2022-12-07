@@ -17,6 +17,4 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "doc: update badges"
-          commit_user_name: Ismael Taboada
-          commit_user_email: ismael.jtr@gmail.com
           file_pattern: README.m
