@@ -6117,13 +6117,185 @@ const mod5 = {
     preprocess: preprocess5,
     main: main5
 };
+function navigateRoot(dir) {
+    while(dir.parent != null){
+        dir = dir.parent;
+    }
+    return dir;
+}
+function navigateParent(dir) {
+    return dir.parent;
+}
+function navigateRelative(dir, path) {
+    const segments = path.split("/");
+    segments.forEach((segment)=>{
+        if (!(segment in dir.children)) {
+            dir.children[segment] = {
+                name: segment,
+                path: `${dir.path}/${segment}`,
+                children: {},
+                parent: dir
+            };
+        }
+        dir = dir.children[segment];
+    });
+    return dir;
+}
+function evaluateCd(command, commands, dir) {
+    const path = command.slice(5);
+    if (path.startsWith("/")) {
+        dir = navigateRoot(dir);
+    } else if (path === "..") {
+        dir = navigateParent(dir);
+    } else {
+        dir = navigateRelative(dir, path);
+    }
+    return {
+        commands,
+        dir
+    };
+}
+function evaluateLs(commands, dir) {
+    while(commands.length > 0 && !commands.at(0)?.startsWith("$")){
+        const [info, name] = commands.shift().split(" ");
+        if (info === "dir") {
+            dir.children[name] = {
+                name,
+                path: `${dir.path}/${name}`,
+                children: {},
+                parent: dir
+            };
+        } else {
+            dir.children[name] = {
+                name,
+                path: `${dir.path}/${name}`,
+                size: BigInt(info)
+            };
+        }
+    }
+    return {
+        commands,
+        dir
+    };
+}
+function evaluateCommand(commands, tree) {
+    const command = commands.shift();
+    switch(true){
+        case command.slice(2).startsWith("cd"):
+            return evaluateCd(command, commands, tree);
+        case command.slice(2).startsWith("ls"):
+            return evaluateLs(commands, tree);
+        default:
+            throw new Error(`unknown command: ${command}`);
+    }
+}
+function isDirectory(dirOrFile) {
+    return "children" in dirOrFile;
+}
+function walkDir(dir, callback) {
+    Object.values(dir.children).forEach((path)=>{
+        callback(path);
+        if (isDirectory(path)) {
+            walkDir(path, callback);
+        }
+    });
+}
+function calculateDirectorySize(dir, cache = new Map()) {
+    let sum = 0n;
+    if (cache.has(dir.name)) {
+        return cache.get(dir.name);
+    }
+    Object.values(dir.children).forEach((path)=>{
+        if (isDirectory(path)) {
+            sum += calculateDirectorySize(path, cache);
+        } else {
+            sum += path.size;
+        }
+    });
+    return sum;
+}
+function partOne6(input) {
+    const root = {
+        parent: undefined,
+        name: "/",
+        path: "",
+        children: {}
+    };
+    let dir = root;
+    while(input.length > 0){
+        ({ commands: input , dir  } = evaluateCommand(input, dir));
+    }
+    const sizes = new Map();
+    walkDir(root, (path)=>{
+        if (!isDirectory(path)) {
+            return;
+        }
+        const size = calculateDirectorySize(path);
+        sizes.set(path.path, size);
+    });
+    return Array.from(sizes.values()).filter((value)=>value <= 100_000n).reduce((a, b)=>a + b, 0n);
+}
+function partTwo6(input) {
+    const root = {
+        parent: undefined,
+        name: "/",
+        path: "",
+        children: {}
+    };
+    let dir = root;
+    while(input.length > 0){
+        ({ commands: input , dir  } = evaluateCommand(input, dir));
+    }
+    const sizes = new Map();
+    walkDir(root, (path)=>{
+        if (!isDirectory(path)) {
+            return;
+        }
+        const size = calculateDirectorySize(path);
+        sizes.set(path.path, size);
+    });
+    const currentUsage = calculateDirectorySize(root);
+    const requireSpace = 70_000_000n - 30_000_000n;
+    const possibleDeletes = Array.from(sizes.values()).filter((value)=>currentUsage - value <= requireSpace);
+    return possibleDeletes.reduce((a, b)=>a < b ? a : b, BigInt(Number.MAX_SAFE_INTEGER));
+}
+function validate6(text) {
+    return text.trim().split("\n").every((line, i, arr)=>{
+        if (/^\$ cd (\/|..|([\w.\/]+))$/.test(line.trim())) {
+            return true;
+        }
+        if (/^\$ ls$/.test(line.trim())) {
+            const nextCommandIndex = arr.slice(i + 1).findIndex((line)=>line.startsWith("$"));
+            return arr.slice(i + 1, nextCommandIndex + 1).every((line)=>/^(dir|\d+) [\w.]+$/.test(line.trim()));
+        }
+        return /^(dir|\d+) [\w.]+$/.test(line.trim());
+    });
+}
+function preprocess6(text) {
+    return text.trim().split("\n").map((line)=>line.trim());
+}
+function main6(text, isPart2) {
+    const input = preprocess6(text);
+    if (isPart2) {
+        return partTwo6(input);
+    }
+    return partOne6(input);
+}
 const mod6 = {
+    partOne: partOne6,
+    partTwo: partTwo6,
+    validate: validate6,
+    preprocess: preprocess6,
+    main: main6
+};
+const mod7 = {
     day1: mod,
     day2: mod1,
     day3: mod2,
     day4: mod3,
     day5: mod4,
-    day6: mod5
+    day6: mod5,
+    day7: mod6
 };
 const today = new Date();
 function isToday(dirtyDate) {
@@ -6187,7 +6359,7 @@ function Calendar({ day , onDaySelected , style  }) {
             fontSize: ".75em",
             textAlign: "center"
         }
-    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod6 ? Me1.createElement("div", {
+    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod7 ? Me1.createElement("div", {
             className: `cursor-pointer ${day === i ? "green-255 blue-168-text disable" : isToday(new Date(`2022/12/${i + 1}`)) ? "yellow-255 blue-168-text" : i === 24 ? "red-255" : "yellow-255-text"}`,
             style: {
                 textAlign: "end"
@@ -6284,7 +6456,7 @@ function Welcome({ onDaySelected  }) {
 }
 function useDay(dayKey) {
     return Me1.useMemo(()=>{
-        return Object.values(mod6)[dayKey];
+        return Object.values(mod7)[dayKey];
     }, [
         dayKey
     ]);
@@ -6336,6 +6508,7 @@ function Day({ day: dayKey , onDaySelected  }) {
     }
     function handlePartChange(event) {
         setPart(event.target.value);
+        setTestOk(undefined);
     }
     function handleOutputChange(event) {
         setExpectedOutput(event.target.value);
@@ -6620,7 +6793,7 @@ function DaySelector({ selectedDay , onDayChange  }) {
     }))));
 }
 function DaysList({ selectedDay , onDayChange  }) {
-    const daysKeys = Me1.useRef(Object.keys(mod6));
+    const daysKeys = Me1.useRef(Object.keys(mod7));
     return Me1.createElement("ul", null, daysKeys.current.map((day, i)=>Me1.createElement("li", {
             key: day,
             className: selectedDay === i ? "green-255" : ""
