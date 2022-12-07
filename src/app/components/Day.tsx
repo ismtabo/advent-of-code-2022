@@ -46,6 +46,7 @@ export function Day({ day: dayKey, onDaySelected }: DayProps) {
   }
   function handlePartChange(event: ChangeEvent<HTMLSelectElement>) {
     setPart(event.target.value as any);
+    setTestOk(undefined);
   }
   function handleOutputChange(event: ChangeEvent<HTMLInputElement>) {
     setExpectedOutput(event.target.value);
