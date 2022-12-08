@@ -6352,7 +6352,7 @@ function lookDown(y, input, x, height) {
     return closesTaller + 1;
 }
 function validate7(text) {
-    return false;
+    return text.trim().split("\n").every((line, _, lines)=>line.trim().length === lines.at(0).trim().length && /^[0-9]+$/.test(line.trim()));
 }
 function preprocess7(text) {
     return text.trim().split("\n").map((line)=>Array.from(line.trim()).map((__char)=>parseInt(__char)));
@@ -6560,6 +6560,9 @@ function ColoredCaps({ children  }) {
 }
 function Day({ day: dayKey , onDaySelected  }) {
     const dialogRef = Me1.useRef(null);
+    const [dialogContent, setDialogContent] = Me1.useState(Me1.createElement(InvalidInputDialogContent, {
+        day: dayKey
+    }));
     const inputRef = Me1.useRef(null);
     const { validate , preprocess , partOne , partTwo , main  } = useDay(dayKey);
     const [input, setInput] = Me1.useState("");
@@ -6567,11 +6570,13 @@ function Day({ day: dayKey , onDaySelected  }) {
     const [expectedOutput, setExpectedOutput] = Me1.useState(undefined);
     const [loading, setLoading] = Me1.useState(false);
     const [testOk, setTestOk] = Me1.useState(undefined);
+    const [runtime, setRuntime] = Me1.useState(undefined);
     Me1.useEffect(()=>{
         setInput("");
         setPart("part1");
         setExpectedOutput(undefined);
         setTestOk(undefined);
+        setRuntime(undefined);
     }, [
         dayKey
     ]);
@@ -6593,31 +6598,36 @@ function Day({ day: dayKey , onDaySelected  }) {
     function handlePartChange(event) {
         setPart(event.target.value);
         setTestOk(undefined);
+        setRuntime(undefined);
     }
     function handleOutputChange(event) {
         setExpectedOutput(event.target.value);
     }
     function handleRun() {
-        if (input == null || input === "") {
+        if (input == null || input === "" || !validate(input)) {
+            setDialogContent(Me1.createElement(InvalidInputDialogContent, {
+                day: dayKey
+            }));
+            dialogRef.current?.showModal();
             return;
         }
-        if (!validate(input)) {
+        if (expectedOutput == null || expectedOutput === "") {
+            setDialogContent(Me1.createElement(MissingOutputDialogContent, null));
             dialogRef.current?.showModal();
             return;
         }
         setLoading(true);
         const parsedInput = preprocess(input);
+        const start = performance.now();
         const output = part === "part1" ? partOne(parsedInput) : partTwo(parsedInput);
-        if (config.log) {
-            console.log(output);
-        }
-        if (expectedOutput != null) {
-            setTestOk(output == expectedOutput);
-        } else {
-            setTestOk(undefined);
-        }
+        const runtime = performance.now() - start;
+        setTestOk(output == expectedOutput);
+        setRuntime(runtime);
         setLoading(false);
-        config.result = output;
+        if (config.log === true) {
+            console.log(output);
+            config.result = output;
+        }
     }
     return Me1.createElement(Me1.Fragment, null, Me1.createElement("style", null, `
         .main {
@@ -6787,14 +6797,14 @@ function Day({ day: dayKey , onDaySelected  }) {
         style: {
             width: 200
         }
-    }, testOk === true ? Me1.createElement(Me1.Fragment, null, "Ok") : testOk === false ? Me1.createElement(Me1.Fragment, null, "Fail") : Me1.createElement(Me1.Fragment, null, "..."))), config.log ? Me1.createElement("div", {
+    }, testOk === true ? Me1.createElement(Me1.Fragment, null, "Ok") : testOk === false ? Me1.createElement(Me1.Fragment, null, "Fail") : Me1.createElement(Me1.Fragment, null, "..."))), Me1.createElement("div", {
         className: "input-group"
-    }, Me1.createElement("label", null, "Test result....:"), Me1.createElement("span", {
-        className: `tui-input${testOk === true ? " green-168" : testOk === false ? " red-255" : ""}`,
+    }, Me1.createElement("label", null, "Runtime (ms).............:"), Me1.createElement("span", {
+        className: `tui-input`,
         style: {
             width: 200
         }
-    }, testOk === true ? Me1.createElement(Me1.Fragment, null, "Ok") : testOk === false ? Me1.createElement(Me1.Fragment, null, "Fail") : Me1.createElement(Me1.Fragment, null, "..."))) : null), Me1.createElement("div", {
+    }, runtime != null ? Me1.createElement(Me1.Fragment, null, runtime.toFixed(4)) : Me1.createElement(Me1.Fragment, null, "...")))), Me1.createElement("div", {
         className: "tui-divider"
     }), Me1.createElement("button", {
         className: "tui-button",
@@ -6811,31 +6821,36 @@ function Day({ day: dayKey , onDaySelected  }) {
     }, Me1.createElement("fieldset", {
         className: "tui-fieldset"
     }, Me1.createElement("legend", {
-        className: "red-255 yellow-255-text"
-    }, "Alert"), Me1.createElement("h3", null, "Invalid input."), Me1.createElement("p", null, "For more information read", " ", Me1.createElement("a", {
-        href: `https://adventofcode.com/2022/day/${dayKey + 1}`,
-        className: "blue-255-text cyan-168-text-hover"
-    }, "day ", dayKey + 1, " page"), "."), Me1.createElement("button", {
+        className: "yellow-255-text"
+    }, "Alert"), dialogContent, Me1.createElement("button", {
         className: "tui-button tui-modal-close-button right",
         "data-modal": "modal",
         onClick: ()=>dialogRef.current?.close()
     }, "close")))));
 }
+function InvalidInputDialogContent({ day  }) {
+    return Me1.createElement(Me1.Fragment, null, Me1.createElement("h3", null, "Invalid input."), Me1.createElement("p", null, "For more information read", " ", Me1.createElement("a", {
+        href: `https://adventofcode.com/2022/day/${day + 1}`,
+        className: "blue-255-text cyan-168-text-hover"
+    }, "day ", day + 1, " page"), "."));
+}
+function MissingOutputDialogContent() {
+    return Me1.createElement(Me1.Fragment, null, Me1.createElement("h3", null, "Missing expected output."), Me1.createElement("p", null, "Introduce an expected output."));
+}
 function useWidth(el) {
     const observer = Me1.useRef();
     const [rect, setContentRect] = Me1.useState(el.current?.getBoundingClientRect());
-    function updateBoundingClient(why) {
+    function updateBoundingClient() {
         return ()=>{
-            console.log(`updating rect [why=${why}]`);
             setContentRect(el.current?.getBoundingClientRect());
         };
     }
-    Me1.useEffect(()=>updateBoundingClient("deps"), [
+    Me1.useEffect(()=>updateBoundingClient(), [
         el.current
     ]);
     Me1.useEffect(()=>{
         observer.current = new ResizeObserver((observers)=>{
-            observers.forEach(updateBoundingClient("observer"));
+            observers.forEach(updateBoundingClient());
         });
         observer.current.observe(el.current ?? document.body);
         return ()=>{
@@ -6888,6 +6903,30 @@ function DaysList({ selectedDay , onDayChange  }) {
 }
 function App() {
     const [selectedDay, setSelectedDay] = Me1.useState();
+    Me1.useEffect(()=>{
+        if (!window.location.hash) {
+            return;
+        }
+        const dayMatch = window.location.hash.match(/^#day(?<day>\d+)$/);
+        if (dayMatch == null) {
+            setSelectedDay(undefined);
+            return;
+        }
+        const day = parseInt(dayMatch.groups?.["day"] ?? "");
+        if (isNaN(day)) {
+            setSelectedDay(undefined);
+            return;
+        }
+        setSelectedDay(day - 1);
+    }, []);
+    Me1.useEffect(()=>{
+        if (selectedDay == null) {
+            return;
+        }
+        window.location.hash = `day${selectedDay + 1}`;
+    }, [
+        selectedDay
+    ]);
     return Me1.createElement(Me1.Fragment, null, Me1.createElement("link", {
         rel: "stylesheet",
         href: "./static/css/App.css"
