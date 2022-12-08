@@ -6288,14 +6288,98 @@ const mod6 = {
     preprocess: preprocess6,
     main: main6
 };
+function partOne7(input) {
+    return input.flat().filter((height, position)=>{
+        const x = Math.floor(position % input[0].length);
+        const y = Math.floor(position / input[0].length);
+        return input.at(y).slice(0, x).every((other)=>other < height) || input.at(y).slice(x + 1).every((other)=>other < height) || input.slice(0, y).every((row)=>row.at(x) < height) || input.slice(y + 1).every((row)=>row.at(x) < height);
+    }).length;
+}
+function partTwo7(input) {
+    const values = input.flat().map((height, position)=>{
+        const x = Math.floor(position % input[0].length);
+        const y = Math.floor(position / input[0].length);
+        if (x === 0 || x === input[0].length - 1 || y === 0 || y === input.length - 1) {
+            return -Infinity;
+        }
+        const up = lookUp(y, input, x, height);
+        const left = lookLeft(x, y, input, height);
+        const right = lookRight(x, input, y, height);
+        const down = lookDown(y, input, x, height);
+        const visibility = left * right * up * down;
+        return visibility;
+    });
+    return Math.max(...values);
+}
+function lookUp(y, input, x, height) {
+    if (y === 0) {
+        return 1;
+    }
+    let closesTaller = input.slice(0, y).reverse().findIndex((row)=>row.at(x) >= height);
+    if (closesTaller === -1) {
+        closesTaller = y - 1;
+    }
+    return closesTaller + 1;
+}
+function lookLeft(x, y, input, height) {
+    if (x === 0) {
+        return 1;
+    }
+    let closestTaller = input.at(y).slice(0, x).reverse().findIndex((other)=>other >= height);
+    if (closestTaller === -1) {
+        closestTaller = x - 1;
+    }
+    return closestTaller + 1;
+}
+function lookRight(x, input, y, height) {
+    if (x === input[0].length - 1) {
+        return 1;
+    }
+    let closestTaller = input.at(y).slice(x + 1).findIndex((other)=>other >= height);
+    if (closestTaller === -1) {
+        closestTaller = input[0].length - x - 2;
+    }
+    return closestTaller + 1;
+}
+function lookDown(y, input, x, height) {
+    if (y === input.length - 1) {
+        return 1;
+    }
+    let closesTaller = input.slice(y + 1).findIndex((row)=>row.at(x) >= height);
+    if (closesTaller === -1) {
+        closesTaller = input.length - y - 2;
+    }
+    return closesTaller + 1;
+}
+function validate7(text) {
+    return false;
+}
+function preprocess7(text) {
+    return text.trim().split("\n").map((line)=>Array.from(line.trim()).map((__char)=>parseInt(__char)));
+}
+function main7(text, isPart2) {
+    const input = preprocess7(text);
+    if (isPart2) {
+        return partTwo7(input);
+    }
+    return partOne7(input);
+}
 const mod7 = {
+    partOne: partOne7,
+    partTwo: partTwo7,
+    validate: validate7,
+    preprocess: preprocess7,
+    main: main7
+};
+const mod8 = {
     day1: mod,
     day2: mod1,
     day3: mod2,
     day4: mod3,
     day5: mod4,
     day6: mod5,
-    day7: mod6
+    day7: mod6,
+    day8: mod7
 };
 const today = new Date();
 function isToday(dirtyDate) {
@@ -6359,7 +6443,7 @@ function Calendar({ day , onDaySelected , style  }) {
             fontSize: ".75em",
             textAlign: "center"
         }
-    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod7 ? Me1.createElement("div", {
+    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod8 ? Me1.createElement("div", {
             className: `cursor-pointer ${day === i ? "green-255 blue-168-text disable" : isToday(new Date(`2022/12/${i + 1}`)) ? "yellow-255 blue-168-text" : i === 24 ? "red-255" : "yellow-255-text"}`,
             style: {
                 textAlign: "end"
@@ -6456,7 +6540,7 @@ function Welcome({ onDaySelected  }) {
 }
 function useDay(dayKey) {
     return Me1.useMemo(()=>{
-        return Object.values(mod7)[dayKey];
+        return Object.values(mod8)[dayKey];
     }, [
         dayKey
     ]);
@@ -6793,7 +6877,7 @@ function DaySelector({ selectedDay , onDayChange  }) {
     }))));
 }
 function DaysList({ selectedDay , onDayChange  }) {
-    const daysKeys = Me1.useRef(Object.keys(mod7));
+    const daysKeys = Me1.useRef(Object.keys(mod8));
     return Me1.createElement("ul", null, daysKeys.current.map((day, i)=>Me1.createElement("li", {
             key: day,
             className: selectedDay === i ? "green-255" : ""
