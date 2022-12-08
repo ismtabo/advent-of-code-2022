@@ -69,7 +69,6 @@ try {
         .option(
           "-p, --part <part:number>",
           "Part of the day solution to run.",
-          { default: 1 },
         )
         .option(
           "-a, --all-parts",

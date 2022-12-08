@@ -5,7 +5,7 @@ declare enum Format {
 }
 
 export interface RunOptions {
-  part: number;
+  part?: number;
   allParts?: boolean;
   time?: boolean;
   sample?: boolean;
