@@ -2,7 +2,10 @@ import { partOne } from "./partOne/mod.ts";
 import { partTwo } from "./partTwo/mod.ts";
 
 export function validate(text: string): boolean {
-  return false;
+  return text.trim().split("\n").every((line, _, lines) =>
+    line.trim().length === lines.at(0)!.trim().length &&
+    /^[0-9]+$/.test(line.trim())
+  );
 }
 
 export function preprocess(text: string) {

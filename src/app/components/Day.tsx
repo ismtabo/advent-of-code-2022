@@ -4,7 +4,7 @@ import { useDay } from "../hooks/use-day.ts";
 import { Calendar } from "./Calendar.tsx";
 import { ColoredCaps } from "./ColoredCaps.tsx";
 
-declare var config: { log: boolean; result: any };
+declare const config: { log: boolean; result: number | string | bigint };
 
 interface DayProps {
   day: number;
@@ -13,6 +13,9 @@ interface DayProps {
 
 export function Day({ day: dayKey, onDaySelected }: DayProps) {
   const dialogRef = React.useRef<HTMLDialogElement>(null);
+  const [dialogContent, setDialogContent] = React.useState(
+    <InvalidInputDialogContent day={dayKey} />,
+  );
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const { validate, preprocess, partOne, partTwo, main } = useDay(
     dayKey,
@@ -26,11 +29,13 @@ export function Day({ day: dayKey, onDaySelected }: DayProps) {
   );
   const [loading, setLoading] = React.useState<boolean>(false);
   const [testOk, setTestOk] = React.useState<boolean | undefined>(undefined);
+  const [runtime, setRuntime] = React.useState<number | undefined>(undefined);
   React.useEffect(() => {
     setInput("");
     setPart("part1");
     setExpectedOutput(undefined);
     setTestOk(undefined);
+    setRuntime(undefined);
   }, [dayKey]);
   function handleInputChange(event: ChangeEvent<HTMLTextAreaElement>) {
     setInput(event.target.value);
@@ -45,35 +50,44 @@ export function Day({ day: dayKey, onDaySelected }: DayProps) {
     setInput("");
   }
   function handlePartChange(event: ChangeEvent<HTMLSelectElement>) {
+    // deno-lint-ignore no-explicit-any
     setPart(event.target.value as any);
     setTestOk(undefined);
+    setRuntime(undefined);
   }
   function handleOutputChange(event: ChangeEvent<HTMLInputElement>) {
     setExpectedOutput(event.target.value);
   }
   function handleRun() {
-    if (input == null || input === "") {
+    if (input == null || input === "" || !validate(input)) {
+      setDialogContent(<InvalidInputDialogContent day={dayKey} />);
+      dialogRef.current?.showModal();
       return;
     }
-    if (!validate(input)) {
+    if (
+      expectedOutput == null ||
+      expectedOutput === ""
+    ) {
+      setDialogContent(<MissingOutputDialogContent />);
       dialogRef.current?.showModal();
       return;
     }
     setLoading(true);
     const parsedInput = preprocess(input);
+    const start = performance.now();
     const output = part === "part1"
+      // deno-lint-ignore no-explicit-any
       ? partOne(parsedInput as any)
+      // deno-lint-ignore no-explicit-any
       : partTwo(parsedInput as any);
-    if (config.log) {
-      console.log(output);
-    }
-    if (expectedOutput != null) {
-      setTestOk(output == expectedOutput);
-    } else {
-      setTestOk(undefined);
-    }
+    const runtime = performance.now() - start;
+    setTestOk(output == expectedOutput);
+    setRuntime(runtime);
     setLoading(false);
-    config.result = output;
+    if (config.log === true) {
+      console.log(output);
+      config.result = output;
+    }
   }
   return (
     <>
@@ -259,29 +273,15 @@ export function Day({ day: dayKey, onDaySelected }: DayProps) {
                       : <>...</>}
                   </span>
                 </div>
-                {config.log
-                  ? (
-                    <div className="input-group">
-                      <label>Test result....:</label>
-                      <span
-                        className={`tui-input${
-                          testOk === true
-                            ? " green-168"
-                            : testOk === false
-                            ? " red-255"
-                            : ""
-                        }`}
-                        style={{ width: 200 }}
-                      >
-                        {testOk === true
-                          ? <>Ok</>
-                          : testOk === false
-                          ? <>Fail</>
-                          : <>...</>}
-                      </span>
-                    </div>
-                  )
-                  : null}
+                <div className="input-group">
+                  <label>Runtime (ms).............:</label>
+                  <span
+                    className={`tui-input`}
+                    style={{ width: 200 }}
+                  >
+                    {runtime != null ? <>{runtime.toFixed(4)}</> : <>...</>}
+                  </span>
+                </div>
               </div>
               <div className="tui-divider" />
               <button
@@ -304,17 +304,8 @@ export function Day({ day: dayKey, onDaySelected }: DayProps) {
         </div>
         <dialog ref={dialogRef} className="tui-window red-168">
           <fieldset className="tui-fieldset">
-            <legend className="red-255 yellow-255-text">Alert</legend>
-            <h3>Invalid input.</h3>
-            <p>
-              For more information read{" "}
-              <a
-                href={`https://adventofcode.com/2022/day/${dayKey + 1}`}
-                className="blue-255-text cyan-168-text-hover"
-              >
-                day {dayKey + 1} page
-              </a>.
-            </p>
+            <legend className="yellow-255-text">Alert</legend>
+            {dialogContent}
             <button
               className="tui-button tui-modal-close-button right"
               data-modal="modal"
@@ -325,6 +316,34 @@ export function Day({ day: dayKey, onDaySelected }: DayProps) {
           </fieldset>
         </dialog>
       </div>
+    </>
+  );
+}
+
+function InvalidInputDialogContent({ day }: { day: number }) {
+  return (
+    <>
+      <h3>Invalid input.</h3>
+      <p>
+        For more information read{" "}
+        <a
+          href={`https://adventofcode.com/2022/day/${day + 1}`}
+          className="blue-255-text cyan-168-text-hover"
+        >
+          day {day + 1} page
+        </a>.
+      </p>
+    </>
+  );
+}
+
+function MissingOutputDialogContent() {
+  return (
+    <>
+      <h3>Missing expected output.</h3>
+      <p>
+        Introduce an expected output.
+      </p>
     </>
   );
 }

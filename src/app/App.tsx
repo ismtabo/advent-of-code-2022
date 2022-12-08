@@ -6,6 +6,28 @@ import { ColoredCaps } from "./components/ColoredCaps.tsx";
 
 function App() {
   const [selectedDay, setSelectedDay] = React.useState<number | undefined>();
+  React.useEffect(() => {
+    if (!window.location.hash) {
+      return;
+    }
+    const dayMatch = window.location.hash.match(/^#day(?<day>\d+)$/);
+    if (dayMatch == null) {
+      setSelectedDay(undefined);
+      return;
+    }
+    const day = parseInt(dayMatch.groups?.["day"] ?? "");
+    if (isNaN(day)) {
+      setSelectedDay(undefined);
+      return;
+    }
+    setSelectedDay(day - 1);
+  }, []);
+  React.useEffect(() => {
+    if (selectedDay == null) {
+      return;
+    }
+    window.location.hash = `day${selectedDay + 1}`;
+  }, [selectedDay]);
   return (
     <>
       <link rel="stylesheet" href="./static/css/App.css" />

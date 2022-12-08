@@ -5,16 +5,15 @@ export function useWidth(el: React.RefObject<HTMLElement>) {
   const [rect, setContentRect] = React.useState<DOMRectReadOnly | undefined>(
     el.current?.getBoundingClientRect(),
   );
-  function updateBoundingClient(why: string) {
+  function updateBoundingClient() {
     return () => {
-      console.log(`updating rect [why=${why}]`);
       setContentRect(el.current?.getBoundingClientRect());
     };
   }
-  React.useEffect(() => updateBoundingClient("deps"), [el.current]);
+  React.useEffect(() => updateBoundingClient(), [el.current]);
   React.useEffect(() => {
     observer.current = new ResizeObserver((observers) => {
-      observers.forEach(updateBoundingClient("observer"));
+      observers.forEach(updateBoundingClient());
     });
     observer.current.observe(el.current ?? document.body);
     return () => {
