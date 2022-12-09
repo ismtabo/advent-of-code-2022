@@ -6371,7 +6371,138 @@ const mod7 = {
     preprocess: preprocess7,
     main: main7
 };
+var Direction;
+(function(Direction) {
+    Direction["UP"] = "U";
+    Direction["LEFT"] = "L";
+    Direction["RIGHT"] = "R";
+    Direction["DOWN"] = "D";
+})(Direction || (Direction = {}));
+function reduceMove(state, move) {
+    const newState = {
+        ...state,
+        head: {
+            ...state.head
+        },
+        tail: {
+            ...state.tail
+        }
+    };
+    for(let i = 0; i < move.steps; i++){
+        newState.head = moveHead(move, newState.head);
+        newState.tail = [
+            moveTail(newState.head, state.tail.at(0))
+        ];
+        state.tail.slice(1).forEach((tail, i)=>newState.tail.push(moveTail(newState.tail.at(i), tail)));
+        newState.visited.add(`${newState.tail.at(-1).x}/${newState.tail.at(-1).y}`);
+        state = {
+            ...newState,
+            head: {
+                ...newState.head
+            },
+            tail: newState.tail.map((tail)=>({
+                    ...tail
+                }))
+        };
+    }
+    return newState;
+}
+function moveHead(move, head) {
+    switch(move.direction){
+        case Direction.UP:
+            return {
+                ...head,
+                y: head.y + 1
+            };
+        case Direction.LEFT:
+            return {
+                ...head,
+                x: head.x - 1
+            };
+        case Direction.RIGHT:
+            return {
+                ...head,
+                x: head.x + 1
+            };
+        case Direction.DOWN:
+            return {
+                ...head,
+                y: head.y - 1
+            };
+    }
+}
+function moveTail(head, tail) {
+    let dirX;
+    let dirY;
+    switch(true){
+        case Math.abs(head.x - tail.x) + Math.abs(head.y - tail.y) > 2:
+            dirX = head.x === tail.x ? 0 : head.x < tail.x ? -1 : 1;
+            dirY = head.y === tail.y ? 0 : head.y < tail.y ? -1 : 1;
+            return {
+                x: tail.x + dirX,
+                y: tail.y + dirY
+            };
+        case Math.abs(head.x - tail.x) > 1:
+            dirX = head.x < tail.x ? -1 : 1;
+            return {
+                ...tail,
+                x: tail.x + dirX
+            };
+        case Math.abs(head.y - tail.y) > 1:
+            dirY = head.y < tail.y ? -1 : 1;
+            return {
+                ...tail,
+                y: tail.y + dirY
+            };
+        default:
+            return {
+                ...tail
+            };
+    }
+}
+function partOne8(input, tailSize = 1) {
+    const endState = input.reduce((state, move)=>reduceMove(state, move), {
+        head: {
+            x: 0,
+            y: 0
+        },
+        tail: new Array(tailSize).fill(null).map(()=>({
+                x: 0,
+                y: 0
+            })),
+        visited: new Set([
+            `0/0`
+        ])
+    });
+    return endState.visited.size;
+}
+function partTwo8(input) {
+    return partOne8(input, 9);
+}
+function validate8(text) {
+    return text.trim().split("\n").every((line)=>/^[ULRD] \d+$/.test(line.trim()));
+}
+function preprocess8(text) {
+    return text.trim().split("\n").map((line)=>line.trim().split(" ", 2)).map(([direction, steps])=>({
+            direction: direction,
+            steps: parseInt(steps)
+        }));
+}
+function main8(text, isPart2) {
+    const input = preprocess8(text);
+    if (isPart2) {
+        return partTwo8(input);
+    }
+    return partOne8(input);
+}
 const mod8 = {
+    partOne: partOne8,
+    partTwo: partTwo8,
+    validate: validate8,
+    preprocess: preprocess8,
+    main: main8
+};
+const mod9 = {
     day1: mod,
     day2: mod1,
     day3: mod2,
@@ -6379,7 +6510,8 @@ const mod8 = {
     day5: mod4,
     day6: mod5,
     day7: mod6,
-    day8: mod7
+    day8: mod7,
+    day9: mod8
 };
 const today = new Date();
 function isToday(dirtyDate) {
@@ -6443,7 +6575,7 @@ function Calendar({ day , onDaySelected , style  }) {
             fontSize: ".75em",
             textAlign: "center"
         }
-    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod8 ? Me1.createElement("div", {
+    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod9 ? Me1.createElement("div", {
             className: `cursor-pointer ${day === i ? "green-255 blue-168-text disable" : isToday(new Date(`2022/12/${i + 1}`)) ? "yellow-255 blue-168-text" : i === 24 ? "red-255" : "yellow-255-text"}`,
             style: {
                 textAlign: "end"
@@ -6540,7 +6672,7 @@ function Welcome({ onDaySelected  }) {
 }
 function useDay(dayKey) {
     return Me1.useMemo(()=>{
-        return Object.values(mod8)[dayKey];
+        return Object.values(mod9)[dayKey];
     }, [
         dayKey
     ]);
@@ -6892,7 +7024,7 @@ function DaySelector({ selectedDay , onDayChange  }) {
     }))));
 }
 function DaysList({ selectedDay , onDayChange  }) {
-    const daysKeys = Me1.useRef(Object.keys(mod8));
+    const daysKeys = Me1.useRef(Object.keys(mod9));
     return Me1.createElement("ul", null, daysKeys.current.map((day, i)=>Me1.createElement("li", {
             key: day,
             className: selectedDay === i ? "green-255" : ""
