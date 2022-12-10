@@ -299,6 +299,15 @@ export function Day({ day: dayKey, onDaySelected }: DayProps) {
               >
                 Advent of Code day page
               </a>
+              <a
+                className="tui-button purple-255"
+                target="_blank"
+                href={`https://github.com/ismtabo/advent-of-code-2022/tree/main/src/solutions/day${
+                  dayKey + 1
+                }`}
+              >
+                Solution source code
+              </a>
             </fieldset>
           </div>
         </div>

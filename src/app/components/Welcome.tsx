@@ -50,15 +50,32 @@ export function Welcome({ onDaySelected }: WelcomeProps) {
               To start testing the solutions just select a day in the nav bar
               and run with your input.
             </p>
-            <p className="center" style={{ marginTop: "1em" }}>
-              <a
-                href="https://adventofcode.com/2022"
-                target="_blank"
-                className="tui-button white-255-text"
-              >
-                Learn More 🕭
-              </a>
-            </p>
+            <div
+              style={{
+                marginTop: "1em",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "1em",
+              }}
+            >
+              <span className="tui-button white-255-text">
+                <a
+                  href="https://adventofcode.com/2022"
+                  target="_blank"
+                >
+                  Learn More 🕭
+                </a>
+              </span>
+              <span className="tui-button white-168">
+                <a
+                  href="https://github.com/ismtabo/advent-of-code-2022"
+                  target="_blank"
+                >
+                  Github Repository
+                </a>
+              </span>
+            </div>
           </div>
         </div>
         <div
