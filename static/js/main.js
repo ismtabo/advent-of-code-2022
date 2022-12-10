@@ -6502,7 +6502,61 @@ const mod8 = {
     preprocess: preprocess8,
     main: main8
 };
+function partOne9(input) {
+    return executeInstructions(input).signals;
+}
+function executeInstructions(instructions) {
+    return instructions.flatMap((line)=>line.startsWith("addx") ? [
+            "wait",
+            line
+        ] : line).reduce((state, ins, iter)=>{
+        const cycle = iter + 1;
+        if (cycle >= 20 && cycle <= 220 && (cycle - 20) % 40 === 0) {
+            state.signals += cycle * state.registers.x;
+        }
+        const currentPixel = iter % 40 + 1;
+        if (state.registers.x <= currentPixel && currentPixel < state.registers.x + 3) {
+            const x = iter % 40;
+            const y = Math.floor(cycle / 40);
+            state.screen.at(y)?.splice(x, 1, "#");
+        }
+        if (ins.startsWith("addx")) {
+            const [_, value] = ins.split(" ", 2);
+            state.registers.x += parseInt(value);
+        }
+        return state;
+    }, {
+        registers: {
+            x: 1
+        },
+        signals: 0,
+        screen: new Array(6).fill(0).map(()=>new Array(40).fill("."))
+    });
+}
+function partTwo9(input) {
+    return executeInstructions(input).screen.map((line)=>line.join("")).join("\n");
+}
+function validate9(text) {
+    return text.trim().split("\n").every((line)=>/^(noop|addx (?:-?(\d+)))$/.test(line.trim()));
+}
+function preprocess9(text) {
+    return text.trim().split("\n").map((line)=>line.trim());
+}
+function main9(text, isPart2) {
+    const input = preprocess9(text);
+    if (isPart2) {
+        return partTwo9(input);
+    }
+    return partOne9(input);
+}
 const mod9 = {
+    partOne: partOne9,
+    partTwo: partTwo9,
+    validate: validate9,
+    preprocess: preprocess9,
+    main: main9
+};
+const mod10 = {
     day1: mod,
     day2: mod1,
     day3: mod2,
@@ -6511,7 +6565,8 @@ const mod9 = {
     day6: mod5,
     day7: mod6,
     day8: mod7,
-    day9: mod8
+    day9: mod8,
+    day10: mod9
 };
 const today = new Date();
 function isToday(dirtyDate) {
@@ -6575,7 +6630,7 @@ function Calendar({ day , onDaySelected , style  }) {
             fontSize: ".75em",
             textAlign: "center"
         }
-    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod9 ? Me1.createElement("div", {
+    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod10 ? Me1.createElement("div", {
             className: `cursor-pointer ${day === i ? "green-255 blue-168-text disable" : isToday(new Date(`2022/12/${i + 1}`)) ? "yellow-255 blue-168-text" : i === 24 ? "red-255" : "yellow-255-text"}`,
             style: {
                 textAlign: "end"
@@ -6641,16 +6696,25 @@ function Welcome({ onDaySelected  }) {
         className: "yellow-255-text"
     }, "*"))), Me1.createElement("div", {
         className: "tui-panel-content white-255-text"
-    }, Me1.createElement("p", null, "This page contains an interactive web application with the solutions of AoC of this year"), Me1.createElement("p", null, "To start testing the solutions just select a day in the nav bar and run with your input."), Me1.createElement("p", {
-        className: "center",
+    }, Me1.createElement("p", null, "This page contains an interactive web application with the solutions of AoC of this year"), Me1.createElement("p", null, "To start testing the solutions just select a day in the nav bar and run with your input."), Me1.createElement("div", {
         style: {
-            marginTop: "1em"
+            marginTop: "1em",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "1em"
         }
+    }, Me1.createElement("span", {
+        className: "tui-button white-255-text"
     }, Me1.createElement("a", {
         href: "https://adventofcode.com/2022",
-        target: "_blank",
-        className: "tui-button white-255-text"
-    }, "Learn More 🕭")))), Me1.createElement("div", {
+        target: "_blank"
+    }, "Learn More 🕭")), Me1.createElement("span", {
+        className: "tui-button white-168"
+    }, Me1.createElement("a", {
+        href: "https://github.com/ismtabo/advent-of-code-2022",
+        target: "_blank"
+    }, "Github Repository"))))), Me1.createElement("div", {
         "data-footer": true,
         style: {
             display: "flex",
@@ -6672,7 +6736,7 @@ function Welcome({ onDaySelected  }) {
 }
 function useDay(dayKey) {
     return Me1.useMemo(()=>{
-        return Object.values(mod9)[dayKey];
+        return Object.values(mod10)[dayKey];
     }, [
         dayKey
     ]);
@@ -6947,7 +7011,11 @@ function Day({ day: dayKey , onDaySelected  }) {
         className: "tui-button cyan-255",
         target: "_blank",
         href: `https://adventofcode.com/2022/day/${dayKey + 1}`
-    }, "Advent of Code day page")))), Me1.createElement("dialog", {
+    }, "Advent of Code day page"), Me1.createElement("a", {
+        className: "tui-button purple-255",
+        target: "_blank",
+        href: `https://github.com/ismtabo/advent-of-code-2022/tree/main/src/solutions/day${dayKey + 1}`
+    }, "Solution source code")))), Me1.createElement("dialog", {
         ref: dialogRef,
         className: "tui-window red-168"
     }, Me1.createElement("fieldset", {
@@ -7024,7 +7092,7 @@ function DaySelector({ selectedDay , onDayChange  }) {
     }))));
 }
 function DaysList({ selectedDay , onDayChange  }) {
-    const daysKeys = Me1.useRef(Object.keys(mod9));
+    const daysKeys = Me1.useRef(Object.keys(mod10));
     return Me1.createElement("ul", null, daysKeys.current.map((day, i)=>Me1.createElement("li", {
             key: day,
             className: selectedDay === i ? "green-255" : ""
