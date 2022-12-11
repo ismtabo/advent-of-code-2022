@@ -6556,7 +6556,88 @@ const mod9 = {
     preprocess: preprocess9,
     main: main9
 };
+function partOne10(input, rounds = 20, partTwo = false) {
+    const inspections = new Map(Array.from(input.keys()).map((key)=>[
+            key,
+            0
+        ]));
+    for (const _round of new Array(rounds).fill(null).map((_, i)=>i)){
+        for (const [id, monkey] of input.entries()){
+            while(monkey.items.length){
+                inspections.set(id, inspections.get(id) + 1);
+                const item = monkey.items.shift();
+                const worryLevel = partTwo ? evaluateOperation(monkey.operation, item) : evaluateOperation(monkey.operation, item) / 3n;
+                const targetMonkey = evaluateTest(monkey.test, worryLevel);
+                input.get(targetMonkey)?.items.push(worryLevel);
+            }
+        }
+        console.error(_round);
+    }
+    return Array.from(inspections.values()).sort((a, b)=>b - a).slice(0, 2).reduce((a, b)=>a * b, 1);
+}
+function evaluateOperation(operation, item) {
+    const left = operation.left === "old" ? item : operation.left;
+    const right = operation.right === "old" ? item : operation.right;
+    if (operation.op === "+") {
+        return left + right;
+    }
+    return left * right;
+}
+function evaluateTest(test, worryLevel) {
+    if (worryLevel % test.module === 0n) {
+        return test.true;
+    }
+    return test.false;
+}
+function partTwo10(input) {
+    return partOne10(input, 10000, true);
+}
+function validate10(text) {
+    return false;
+}
+function preprocess10(text) {
+    return new Map(text.trim().split("\n\n").map((monkeyLines)=>{
+        const [infoLine, itemsLine, operationLine, testLine, testTrueLine, testFalseLine] = monkeyLines.trim().split("\n", 6);
+        const id = infoLine.match(/Monkey (?<id>\d+):/)?.groups?.id;
+        const items = itemsLine.split(": ", 2).at(-1)?.split(" ").map((item)=>BigInt(parseInt(item)));
+        const operation = operationLine.match(/new = (?<left>old|\d+) (?<op>[+*]) (?<right>old|\d+)/)?.groups;
+        const test = BigInt(testLine.match(/divisible by (?<number>\d+)/)?.groups?.number);
+        const trueBranch = testTrueLine.match(/throw to monkey (?<id>\d+)/)?.groups?.id;
+        const falseBranch = testFalseLine.match(/throw to monkey (?<id>\d+)/)?.groups?.id;
+        return [
+            id,
+            {
+                id,
+                items,
+                operation: {
+                    op: operation.op,
+                    left: /old/.test(operation.left) ? "old" : BigInt(operation.left),
+                    right: /old/.test(operation.right) ? "old" : BigInt(operation.right)
+                },
+                test: {
+                    module: test,
+                    true: trueBranch,
+                    false: falseBranch
+                }
+            }
+        ];
+    }));
+}
+function main10(text, isPart2) {
+    const input = preprocess10(text);
+    if (isPart2) {
+        return partTwo10(input);
+    }
+    return partOne10(input);
+}
 const mod10 = {
+    partOne: partOne10,
+    partTwo: partTwo10,
+    validate: validate10,
+    preprocess: preprocess10,
+    main: main10
+};
+const mod11 = {
     day1: mod,
     day2: mod1,
     day3: mod2,
@@ -6566,7 +6647,8 @@ const mod10 = {
     day7: mod6,
     day8: mod7,
     day9: mod8,
-    day10: mod9
+    day10: mod9,
+    day11: mod10
 };
 const today = new Date();
 function isToday(dirtyDate) {
@@ -6630,7 +6712,7 @@ function Calendar({ day , onDaySelected , style  }) {
             fontSize: ".75em",
             textAlign: "center"
         }
-    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod10 ? Me1.createElement("div", {
+    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod11 ? Me1.createElement("div", {
             className: `cursor-pointer ${day === i ? "green-255 blue-168-text disable" : isToday(new Date(`2022/12/${i + 1}`)) ? "yellow-255 blue-168-text" : i === 24 ? "red-255" : "yellow-255-text"}`,
             style: {
                 textAlign: "end"
@@ -6736,7 +6818,7 @@ function Welcome({ onDaySelected  }) {
 }
 function useDay(dayKey) {
     return Me1.useMemo(()=>{
-        return Object.values(mod10)[dayKey];
+        return Object.values(mod11)[dayKey];
     }, [
         dayKey
     ]);
@@ -7092,7 +7174,7 @@ function DaySelector({ selectedDay , onDayChange  }) {
     }))));
 }
 function DaysList({ selectedDay , onDayChange  }) {
-    const daysKeys = Me1.useRef(Object.keys(mod10));
+    const daysKeys = Me1.useRef(Object.keys(mod11));
     return Me1.createElement("ul", null, daysKeys.current.map((day, i)=>Me1.createElement("li", {
             key: day,
             className: selectedDay === i ? "green-255" : ""
