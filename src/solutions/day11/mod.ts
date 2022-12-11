@@ -3,7 +3,24 @@ import { partTwo } from "./partTwo/mod.ts";
 import { Operation } from "./types.d.ts";
 
 export function validate(text: string): boolean {
-  return false;
+  return text.trim().split("\n\n").every((monkeyLines) => {
+    const [
+      infoLine,
+      itemsLine,
+      operationLine,
+      testLine,
+      testTrueLine,
+      testFalseLine,
+    ] = monkeyLines.trim().split("\n", 6);
+    return /^Monkey \d+:$/.test(infoLine.trim()) &&
+      /^Starting items: \d+(, \d+)*$/.test(itemsLine.trim()) &&
+      /^Operation: new = (old|\d+) [+*] (old|\d+)$/.test(
+        operationLine.trim(),
+      ) &&
+      /^Test: divisible by \d+$/.test(testLine.trim()) &&
+      /^If true: throw to monkey \d+$/.test(testTrueLine.trim()) &&
+      /^If false: throw to monkey \d+$/.test(testFalseLine.trim());
+  });
 }
 
 export function preprocess(text: string) {
