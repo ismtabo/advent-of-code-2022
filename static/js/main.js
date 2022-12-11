@@ -6561,17 +6561,17 @@ function partOne10(input, rounds = 20, partTwo = false) {
             key,
             0
         ]));
+    const lcm = calculateLCM(...Array.from(input.values()).map((monkey)=>monkey.test.module));
     for (const _round of new Array(rounds).fill(null).map((_, i)=>i)){
         for (const [id, monkey] of input.entries()){
             while(monkey.items.length){
                 inspections.set(id, inspections.get(id) + 1);
                 const item = monkey.items.shift();
-                const worryLevel = partTwo ? evaluateOperation(monkey.operation, item) : evaluateOperation(monkey.operation, item) / 3n;
+                const worryLevel = partTwo ? evaluateOperation(monkey.operation, item) % lcm : evaluateOperation(monkey.operation, item) / 3n;
                 const targetMonkey = evaluateTest(monkey.test, worryLevel);
                 input.get(targetMonkey)?.items.push(worryLevel);
             }
         }
-        console.error(_round);
     }
     return Array.from(inspections.values()).sort((a, b)=>b - a).slice(0, 2).reduce((a, b)=>a * b, 1);
 }
@@ -6589,11 +6589,21 @@ function evaluateTest(test, worryLevel) {
     }
     return test.false;
 }
+const calculateLCM = (...arr)=>{
+    const gcd = (x, y)=>!y ? x : gcd(y, x % y);
+    const _lcm = (x, y)=>x * y / gcd(x, y);
+    return [
+        ...arr
+    ].reduce((a, b)=>_lcm(a, b));
+};
 function partTwo10(input) {
-    return partOne10(input, 10000, true);
+    return partOne10(input, 10_000, true);
 }
 function validate10(text) {
-    return false;
+    return text.trim().split("\n\n").every((monkeyLines)=>{
+        const [infoLine, itemsLine, operationLine, testLine, testTrueLine, testFalseLine] = monkeyLines.trim().split("\n", 6);
+        return /^Monkey \d+:$/.test(infoLine.trim()) && /^Starting items: \d+(, \d+)*$/.test(itemsLine.trim()) && /^Operation: new = (old|\d+) [+*] (old|\d+)$/.test(operationLine.trim()) && /^Test: divisible by \d+$/.test(testLine.trim()) && /^If true: throw to monkey \d+$/.test(testTrueLine.trim()) && /^If false: throw to monkey \d+$/.test(testFalseLine.trim());
+    });
 }
 function preprocess10(text) {
     return new Map(text.trim().split("\n\n").map((monkeyLines)=>{
