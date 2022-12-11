@@ -19,8 +19,8 @@
       ],
       "args": [
         "run",
-        "-d10",
-        "-p1",
+        "-d11",
+        "-p2",
         "--sample",
         // "--file=src/solutions/day10/sample1.txt"
         // "--force"
@@ -43,5 +43,18 @@
       ],
       "attachSimplePort": 9229
     },
+    {
+      "name": "Python: archivo actual",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": [
+        "<",
+        "src/solutions/day11/sample.txt"
+      ],
+      "cwd": "${workspaceFolder}"
+    }
   ]
 }
