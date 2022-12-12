@@ -169,7 +169,6 @@ export function Day({ day: dayKey, onDaySelected }: DayProps) {
                 placeholder="..."
                 value={input}
                 onChange={handleInputChange}
-                onPaste={handleScrollInputTop}
                 spellCheck={false}
               >
               </textarea>
