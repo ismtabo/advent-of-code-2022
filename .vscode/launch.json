@@ -19,8 +19,8 @@
       ],
       "args": [
         "run",
-        "-d11",
-        "-p2",
+        "-d12",
+        "-p1",
         "--sample",
         // "--file=src/solutions/day10/sample1.txt"
         // "--force"

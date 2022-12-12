@@ -10,5 +10,13 @@
   "typescript.preferences.importModuleSpecifierEnding": "js",
   "conventionalCommits.scopes": [
     "cli"
+  ],
+  "files.associations": {
+    "*.log-viewer": "log"
+  },
+  "logViewer.watch": [
+    {
+      "pattern": "*.log"
+    }
   ]
 }
