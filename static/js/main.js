@@ -7186,7 +7186,6 @@ function Day({ day: dayKey , onDaySelected  }) {
         placeholder: "...",
         value: input,
         onChange: handleInputChange,
-        onPaste: handleScrollInputTop,
         spellCheck: false
     }), Me1.createElement("div", {
         style: {
