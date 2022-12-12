@@ -6647,7 +6647,190 @@ const mod10 = {
     preprocess: preprocess10,
     main: main10
 };
+function partOne11({ grid , start , end  }) {
+    const queue = new Array();
+    const visited = new Map();
+    queue.push({
+        point: start,
+        steps: 0,
+        score: 1,
+        from: "S"
+    });
+    while(queue.length){
+        const { point , parent , steps , score , from  } = queue.shift();
+        const neighbors = getNeighbors(point, grid);
+        visited.set(`${point.x}/${point.y}`, {
+            point,
+            steps,
+            parent,
+            score,
+            from
+        });
+        if (point.x === end.x && point.y === end.y) {
+            break;
+        }
+        for (const { x , y , from: from1  } of neighbors){
+            if (!visited.has(`${x}/${y}`) && !queue.some((other)=>other.point.x === x && other.point.y === y)) {
+                queue.push({
+                    point: {
+                        x,
+                        y
+                    },
+                    steps: steps + 1,
+                    parent: point,
+                    score: score + 1,
+                    from: from1
+                });
+            }
+        }
+    }
+    let last = visited.get(`${end.x}/${end.y}`);
+    const path = new Array();
+    while(last?.parent){
+        last = visited.get(`${last.parent.x}/${last.parent.y}`);
+        path.unshift(`${last.point.x}/${last.point.y}`);
+    }
+    return path.length;
+}
+function getNeighbors({ x , y  }, grid) {
+    const currentCell = grid[y][x];
+    const neighbors = new Array();
+    if (y > 0) {
+        const cell = grid[y - 1][x];
+        if (cell != null && (cell - currentCell === 1 || cell - currentCell <= 0)) {
+            neighbors.push({
+                x,
+                y: y - 1,
+                from: "^"
+            });
+        }
+    }
+    if (x > 0) {
+        const cell1 = grid[y][x - 1];
+        if (cell1 != null && (cell1 - currentCell === 1 || cell1 - currentCell <= 0)) {
+            neighbors.push({
+                x: x - 1,
+                y,
+                from: "<"
+            });
+        }
+    }
+    if (y < grid.length - 1) {
+        const cell2 = grid[y + 1][x];
+        if (cell2 != null && (cell2 - currentCell === 1 || cell2 - currentCell <= 0)) {
+            neighbors.push({
+                x,
+                y: y + 1,
+                from: "V"
+            });
+        }
+    }
+    if (x < grid[0].length - 1) {
+        const cell3 = grid[y][x + 1];
+        if (cell3 != null && (cell3 - currentCell === 1 || cell3 - currentCell <= 0)) {
+            neighbors.push({
+                x: x + 1,
+                y,
+                from: ">"
+            });
+        }
+    }
+    return neighbors;
+}
+function partTwo11({ grid , start , end  }) {
+    const queue = new Array();
+    const visited = new Map();
+    queue.push({
+        point: start,
+        steps: 0,
+        score: 0,
+        from: "S"
+    });
+    queue.push(...grid.flatMap((row, i)=>row.reduce((acc, cell, j)=>cell === 0 ? acc.concat([
+                {
+                    x: j,
+                    y: i
+                }
+            ]) : acc, new Array())).map(({ x , y  })=>({
+            point: {
+                x,
+                y
+            },
+            steps: 0,
+            score: 0,
+            from: "a"
+        })));
+    while(queue.length){
+        const { point , parent , steps , score , from  } = queue.shift();
+        const neighbors = getNeighbors(point, grid);
+        visited.set(`${point.x}/${point.y}`, {
+            point,
+            steps,
+            parent,
+            score,
+            from
+        });
+        for (const { x , y , from: from1  } of neighbors){
+            if (!visited.has(`${x}/${y}`) && !queue.some((other)=>other.point.x === x && other.point.y === y)) {
+                queue.push({
+                    point: {
+                        x,
+                        y
+                    },
+                    steps: steps + 1,
+                    parent: point,
+                    score: score + 1,
+                    from: from1
+                });
+            }
+        }
+    }
+    let last = visited.get(`${end.x}/${end.y}`);
+    const path = new Array();
+    while(last?.parent){
+        last = visited.get(`${last.parent.x}/${last.parent.y}`);
+        path.unshift(`${last.point.x}/${last.point.y}`);
+    }
+    return path.length;
+}
+function validate11(text) {
+    const lines = text.trim().split("\n").map((line)=>line.trim());
+    return lines.every((line)=>/^[SEa-z]+$/.test(line.trim())) && lines.every((line)=>line.length === lines.at(0)?.length) && lines.flatMap((line)=>Array.from(line)).filter((cell)=>cell === "S").length === 1 && lines.flatMap((line)=>Array.from(line)).filter((cell)=>cell === "E").length === 1;
+}
+function preprocess11(text) {
+    const grid = text.trim().split("\n").map((line)=>Array.from(line.trim()));
+    const sX = grid.reduce((acc, row)=>Math.max(acc, row.findIndex((val)=>val === "S")), -1);
+    const sY = grid.findIndex((row)=>row.includes("S"));
+    const eX = grid.reduce((acc, row)=>Math.max(acc, row.findIndex((val)=>val === "E")), -1);
+    const eY = grid.findIndex((row)=>row.includes("E"));
+    const map = grid.map((row)=>row.map((val)=>val === "S" ? -1 : val === "E" ? 26 : val.charCodeAt(0) - 97));
+    return {
+        grid: map,
+        start: {
+            x: sX,
+            y: sY
+        },
+        end: {
+            x: eX,
+            y: eY
+        }
+    };
+}
+function main11(text, isPart2) {
+    const input = preprocess11(text);
+    if (isPart2) {
+        return partTwo11(input);
+    }
+    return partOne11(input);
+}
 const mod11 = {
+    partOne: partOne11,
+    partTwo: partTwo11,
+    validate: validate11,
+    preprocess: preprocess11,
+    main: main11
+};
+const mod12 = {
     day1: mod,
     day2: mod1,
     day3: mod2,
@@ -6658,7 +6841,8 @@ const mod11 = {
     day8: mod7,
     day9: mod8,
     day10: mod9,
-    day11: mod10
+    day11: mod10,
+    day12: mod11
 };
 const today = new Date();
 function isToday(dirtyDate) {
@@ -6722,7 +6906,7 @@ function Calendar({ day , onDaySelected , style  }) {
             fontSize: ".75em",
             textAlign: "center"
         }
-    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod11 ? Me1.createElement("div", {
+    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod12 ? Me1.createElement("div", {
             className: `cursor-pointer ${day === i ? "green-255 blue-168-text disable" : isToday(new Date(`2022/12/${i + 1}`)) ? "yellow-255 blue-168-text" : i === 24 ? "red-255" : "yellow-255-text"}`,
             style: {
                 textAlign: "end"
@@ -6828,7 +7012,7 @@ function Welcome({ onDaySelected  }) {
 }
 function useDay(dayKey) {
     return Me1.useMemo(()=>{
-        return Object.values(mod11)[dayKey];
+        return Object.values(mod12)[dayKey];
     }, [
         dayKey
     ]);
@@ -7184,7 +7368,7 @@ function DaySelector({ selectedDay , onDayChange  }) {
     }))));
 }
 function DaysList({ selectedDay , onDayChange  }) {
-    const daysKeys = Me1.useRef(Object.keys(mod11));
+    const daysKeys = Me1.useRef(Object.keys(mod12));
     return Me1.createElement("ul", null, daysKeys.current.map((day, i)=>Me1.createElement("li", {
             key: day,
             className: selectedDay === i ? "green-255" : ""
