@@ -6830,7 +6830,117 @@ const mod11 = {
     preprocess: preprocess11,
     main: main11
 };
+function partOne12(input) {
+    return input.map(([left, right])=>comparePackets(left, right)).reduce((acc, result, i)=>result < 0 ? acc + (i + 1) : acc, 0);
+}
+function comparePackets(left, right) {
+    return compareBothArrays(left, right);
+}
+function compareSubPackets(left, right) {
+    if (typeof left === "number" && typeof right === "number") {
+        return compareBothNumbers(left, right);
+    }
+    if (Array.isArray(left) && Array.isArray(right)) {
+        return compareBothArrays(left, right);
+    }
+    if (Array.isArray(right)) {
+        return compareBothArrays([
+            left
+        ], right);
+    }
+    if (Array.isArray(left)) {
+        return compareBothArrays(left, [
+            right
+        ]);
+    }
+    throw new Error();
+}
+function compareBothNumbers(left, right) {
+    return left < right ? -1 : left === right ? 0 : 1;
+}
+function compareBothArrays(left, right) {
+    while(left.length && right.length){
+        const leftPacket = left.shift();
+        const rightPacket = right.shift();
+        const result = compareSubPackets(leftPacket, rightPacket);
+        if (result !== 0) {
+            return result;
+        }
+    }
+    if (left.length === 0 && right.length !== 0) {
+        return -1;
+    }
+    if (right.length === 0 && left.length !== 0) {
+        return 1;
+    }
+    return 0;
+}
+function partTwo12(input) {
+    const sortedPackets = input.flat().concat([
+        [
+            [
+                2
+            ]
+        ]
+    ], [
+        [
+            [
+                6
+            ]
+        ]
+    ]).sort((a, b)=>comparePackets(deepClone(a), deepClone(b)));
+    const firstDividerPacket = sortedPackets.findIndex((packet)=>JSON.stringify(packet) === JSON.stringify([
+            [
+                2
+            ]
+        ]));
+    const secondDividerPacket = sortedPackets.findIndex((packet)=>JSON.stringify(packet) === JSON.stringify([
+            [
+                6
+            ]
+        ]));
+    return (firstDividerPacket + 1) * (secondDividerPacket + 1);
+}
+const deepClone = (obj)=>{
+    if (obj === null) return null;
+    let clone = {
+        ...obj
+    };
+    Object.keys(clone).forEach((key)=>clone[key] = typeof obj[key] === "object" ? deepClone(obj[key]) : obj[key]);
+    return Array.isArray(obj) && obj.length ? (clone.length = obj.length) && Array.from(clone) : Array.isArray(obj) ? Array.from(obj) : clone;
+};
+function validate12(text) {
+    return text.trim().split("\n\n").every((group)=>group.trim().split("\n").every((line)=>{
+            debugger;
+            if (!/^[\[\]0-9,]+$/.test(line.trim())) {
+                return false;
+            }
+            try {
+                const result = JSON.parse(line);
+                return Array.isArray(result);
+            } catch  {
+                return false;
+            }
+        }));
+}
+function preprocess12(text) {
+    return text.trim().split("\n\n").map((group)=>group.trim().split("\n").map((line)=>JSON.parse(line)));
+}
+function main12(text, isPart2) {
+    const input = preprocess12(text);
+    if (isPart2) {
+        return partTwo12(input);
+    }
+    return partOne12(input);
+}
 const mod12 = {
+    partOne: partOne12,
+    partTwo: partTwo12,
+    validate: validate12,
+    preprocess: preprocess12,
+    main: main12
+};
+const mod13 = {
     day1: mod,
     day2: mod1,
     day3: mod2,
@@ -6842,7 +6952,8 @@ const mod12 = {
     day9: mod8,
     day10: mod9,
     day11: mod10,
-    day12: mod11
+    day12: mod11,
+    day13: mod12
 };
 const today = new Date();
 function isToday(dirtyDate) {
@@ -6906,7 +7017,7 @@ function Calendar({ day , onDaySelected , style  }) {
             fontSize: ".75em",
             textAlign: "center"
         }
-    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod12 ? Me1.createElement("div", {
+    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod13 ? Me1.createElement("div", {
             className: `cursor-pointer ${day === i ? "green-255 blue-168-text disable" : isToday(new Date(`2022/12/${i + 1}`)) ? "yellow-255 blue-168-text" : i === 24 ? "red-255" : "yellow-255-text"}`,
             style: {
                 textAlign: "end"
@@ -7012,7 +7123,7 @@ function Welcome({ onDaySelected  }) {
 }
 function useDay(dayKey) {
     return Me1.useMemo(()=>{
-        return Object.values(mod12)[dayKey];
+        return Object.values(mod13)[dayKey];
     }, [
         dayKey
     ]);
@@ -7367,7 +7478,7 @@ function DaySelector({ selectedDay , onDayChange  }) {
     }))));
 }
 function DaysList({ selectedDay , onDayChange  }) {
-    const daysKeys = Me1.useRef(Object.keys(mod12));
+    const daysKeys = Me1.useRef(Object.keys(mod13));
     return Me1.createElement("ul", null, daysKeys.current.map((day, i)=>Me1.createElement("li", {
             key: day,
             className: selectedDay === i ? "green-255" : ""
