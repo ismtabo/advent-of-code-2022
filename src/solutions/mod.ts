@@ -11,3 +11,4 @@ export * as day10 from "./day10/mod.ts";
 export * as day11 from "./day11/mod.ts";
 export * as day12 from "./day12/mod.ts";
 export * as day13 from "./day13/mod.ts";
+export * as day14 from "./day14/mod.ts";

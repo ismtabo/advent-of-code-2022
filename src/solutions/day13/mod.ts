@@ -5,7 +5,6 @@ import { Packet } from "./types.d.ts";
 export function validate(text: string): boolean {
   return text.trim().split("\n\n").every((group) =>
     group.trim().split("\n").every((line) => {
-      debugger;
       if (!/^[\[\]0-9,]+$/.test(line.trim())) {
         return false;
       }
