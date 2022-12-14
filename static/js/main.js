@@ -6911,7 +6911,6 @@ const deepClone = (obj)=>{
 };
 function validate12(text) {
     return text.trim().split("\n\n").every((group)=>group.trim().split("\n").every((line)=>{
-            debugger;
             if (!/^[\[\]0-9,]+$/.test(line.trim())) {
                 return false;
             }
@@ -6940,7 +6939,140 @@ const mod12 = {
     preprocess: preprocess12,
     main: main12
 };
+function partOne13(input) {
+    const map = new Map();
+    input.forEach((line)=>{
+        line.slice(0, -1).forEach((start, i)=>{
+            const [startX, startY] = start.split(",", 2).map((item)=>parseInt(item));
+            const [endX, endY] = line[i + 1].split(",", 2).map((item)=>parseInt(item));
+            if (startX !== endX) {
+                for(let i1 = Math.min(startX, endX); i1 <= Math.max(startX, endX); i1++){
+                    map.set(`${i1},${startY}`, "#");
+                }
+            }
+            if (startY !== endY) {
+                for(let i2 = Math.min(startY, endY); i2 <= Math.max(startY, endY); i2++){
+                    map.set(`${startX},${i2}`, "#");
+                }
+            }
+        });
+    });
+    const abyssStart = Math.max(...Array.from(map.keys()).map((item)=>parseInt(item.split(",").at(1))));
+    let sandX, sandY;
+    sand: while(true){
+        sandX = 500;
+        sandY = 0;
+        while(true){
+            if (sandY >= abyssStart) {
+                break sand;
+            }
+            if (![
+                "o",
+                "#"
+            ].includes(map.get(`${sandX},${sandY + 1}`))) {
+                sandY += 1;
+                continue;
+            }
+            if (![
+                "o",
+                "#"
+            ].includes(map.get(`${sandX - 1},${sandY + 1}`))) {
+                sandX -= 1;
+                sandY += 1;
+                continue;
+            }
+            if (![
+                "o",
+                "#"
+            ].includes(map.get(`${sandX + 1},${sandY + 1}`))) {
+                sandX += 1;
+                sandY += 1;
+                continue;
+            }
+            map.set(`${sandX},${sandY}`, "o");
+            break;
+        }
+    }
+    return Array.from(map.values()).filter((value)=>value === "o").length;
+}
+function partTwo13(input) {
+    const map = new Map();
+    input.forEach((line)=>{
+        line.slice(0, -1).forEach((start, i)=>{
+            const [startX, startY] = start.split(",", 2).map((item)=>parseInt(item));
+            const [endX, endY] = line[i + 1].split(",", 2).map((item)=>parseInt(item));
+            if (startX !== endX) {
+                for(let i1 = Math.min(startX, endX); i1 <= Math.max(startX, endX); i1++){
+                    map.set(`${i1},${startY}`, "#");
+                }
+            }
+            if (startY !== endY) {
+                for(let i2 = Math.min(startY, endY); i2 <= Math.max(startY, endY); i2++){
+                    map.set(`${startX},${i2}`, "#");
+                }
+            }
+        });
+    });
+    const abyssStart = Math.max(...Array.from(map.keys()).map((item)=>parseInt(item.split(",").at(1))));
+    const floor = abyssStart + 2;
+    let sandX, sandY;
+    sand: while(true){
+        sandX = 500;
+        sandY = 0;
+        while(true){
+            if (!isOccupied(map, floor, sandX, sandY + 1)) {
+                sandY += 1;
+                continue;
+            }
+            if (!isOccupied(map, floor, sandX - 1, sandY + 1)) {
+                sandX -= 1;
+                sandY += 1;
+                continue;
+            }
+            if (!isOccupied(map, floor, sandX + 1, sandY + 1)) {
+                sandX += 1;
+                sandY += 1;
+                continue;
+            }
+            map.set(`${sandX},${sandY}`, "o");
+            if (sandX === 500 && sandY === 0) {
+                break sand;
+            }
+            break;
+        }
+    }
+    return Array.from(map.values()).filter((value)=>value === "o").length;
+}
+function isOccupied(map, floor, x, y) {
+    if (y === floor) {
+        return true;
+    }
+    return [
+        "o",
+        "#"
+    ].includes(map.get(`${x},${y}`));
+}
+function validate13(text) {
+    return text.trim().split("\n").every((line)=>/^\d+,\d+( -> \d+,\d+)+$/.test(line.trim()));
+}
+function preprocess13(text) {
+    return text.trim().split("\n").map((line)=>line.trim().split(" -> "));
+}
+function main13(text, isPart2) {
+    const input = preprocess13(text);
+    if (isPart2) {
+        return partTwo13(input);
+    }
+    return partOne13(input);
+}
 const mod13 = {
+    partOne: partOne13,
+    partTwo: partTwo13,
+    validate: validate13,
+    preprocess: preprocess13,
+    main: main13
+};
+const mod14 = {
     day1: mod,
     day2: mod1,
     day3: mod2,
@@ -6953,7 +7085,8 @@ const mod13 = {
     day10: mod9,
     day11: mod10,
     day12: mod11,
-    day13: mod12
+    day13: mod12,
+    day14: mod13
 };
 const today = new Date();
 function isToday(dirtyDate) {
@@ -7017,7 +7150,7 @@ function Calendar({ day , onDaySelected , style  }) {
             fontSize: ".75em",
             textAlign: "center"
         }
-    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod13 ? Me1.createElement("div", {
+    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod14 ? Me1.createElement("div", {
             className: `cursor-pointer ${day === i ? "green-255 blue-168-text disable" : isToday(new Date(`2022/12/${i + 1}`)) ? "yellow-255 blue-168-text" : i === 24 ? "red-255" : "yellow-255-text"}`,
             style: {
                 textAlign: "end"
@@ -7123,7 +7256,7 @@ function Welcome({ onDaySelected  }) {
 }
 function useDay(dayKey) {
     return Me1.useMemo(()=>{
-        return Object.values(mod13)[dayKey];
+        return Object.values(mod14)[dayKey];
     }, [
         dayKey
     ]);
@@ -7478,7 +7611,7 @@ function DaySelector({ selectedDay , onDayChange  }) {
     }))));
 }
 function DaysList({ selectedDay , onDayChange  }) {
-    const daysKeys = Me1.useRef(Object.keys(mod13));
+    const daysKeys = Me1.useRef(Object.keys(mod14));
     return Me1.createElement("ul", null, daysKeys.current.map((day, i)=>Me1.createElement("li", {
             key: day,
             className: selectedDay === i ? "green-255" : ""
