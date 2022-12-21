@@ -7072,7 +7072,118 @@ const mod13 = {
     preprocess: preprocess13,
     main: main13
 };
+function partOne14(input) {
+    return NaN;
+}
+function partTwo14(input) {
+    return NaN;
+}
+function validate14(text) {
+    return false;
+}
+function preprocess14(text) {
+    return text.trim().split("\n").map((line)=>{
+        const [sensorInfo, beaconInfo] = line.trim().split(":", 2);
+        const { x: sensorX , y: sensorY  } = sensorInfo.match(/x=(?<x>-?\d+), y=(?<y>-?\d+)/)?.groups;
+        const { x: beaconX , y: beaconY  } = beaconInfo.match(/x=(?<x>-?\d+), y=(?<y>-?\d+)/)?.groups;
+        return {
+            sensor: {
+                x: parseInt(sensorX),
+                y: parseInt(sensorY)
+            },
+            beacon: {
+                x: parseInt(beaconX),
+                y: parseInt(beaconY)
+            }
+        };
+    });
+}
+function main14(text, isPart2) {
+    const input = preprocess14(text);
+    if (isPart2) {
+        return partTwo14(input);
+    }
+    return partOne14(input);
+}
 const mod14 = {
+    partOne: partOne14,
+    partTwo: partTwo14,
+    validate: validate14,
+    preprocess: preprocess14,
+    main: main14
+};
+function calculateRegister(register, registers, cache = new Map()) {
+    if (cache.has(register)) {
+        return cache.get(register);
+    }
+    const value = registers.get(register);
+    if (value == null) {
+        throw new Error(`missing value [register=${register}]`);
+    }
+    if (typeof value === "number") {
+        cache.set(register, value);
+        return value;
+    }
+    const left = calculateRegister(value.left, registers, cache);
+    const right = calculateRegister(value.right, registers, cache);
+    switch(value?.operator){
+        case "+":
+            return left + right;
+        case "-":
+            return left - right;
+        case "*":
+            return left * right;
+        case "/":
+            return left / right;
+        default:
+            throw new Error(`unknown operator ${value?.operator} [register=${register}]`);
+    }
+}
+function partOne15(input) {
+    return calculateRegister("root", input);
+}
+function partTwo15(input) {
+    return NaN;
+}
+function validate15(text) {
+    return false;
+}
+function preprocess15(text) {
+    return new Map(text.trim().split("\n").map((line)=>{
+        const [key, value] = line.trim().split(": ", 2);
+        const literal = parseInt(value);
+        if (!isNaN(literal)) {
+            return [
+                key,
+                literal
+            ];
+        }
+        const [left, operator, right] = value.split(" ", 3);
+        return [
+            key,
+            {
+                left,
+                operator,
+                right
+            }
+        ];
+    }));
+}
+function main15(text, isPart2) {
+    const input = preprocess15(text);
+    if (isPart2) {
+        return partTwo15(input);
+    }
+    return partOne15(input);
+}
+const mod15 = {
+    partOne: partOne15,
+    partTwo: partTwo15,
+    validate: validate15,
+    preprocess: preprocess15,
+    main: main15
+};
+const mod16 = {
     day1: mod,
     day2: mod1,
     day3: mod2,
@@ -7086,7 +7197,9 @@ const mod14 = {
     day11: mod10,
     day12: mod11,
     day13: mod12,
-    day14: mod13
+    day14: mod13,
+    day15: mod14,
+    day21: mod15
 };
 const today = new Date();
 function isToday(dirtyDate) {
@@ -7150,7 +7263,7 @@ function Calendar({ day , onDaySelected , style  }) {
             fontSize: ".75em",
             textAlign: "center"
         }
-    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod14 ? Me1.createElement("div", {
+    }, "Sun"), new Array(7 - dowEndOfMonth).fill(null).map((_, i)=>Me1.createElement("div", null)), new Array(31).fill(null).map((_, i)=>`day${i + 1}` in mod16 ? Me1.createElement("div", {
             className: `cursor-pointer ${day === i ? "green-255 blue-168-text disable" : isToday(new Date(`2022/12/${i + 1}`)) ? "yellow-255 blue-168-text" : i === 24 ? "red-255" : "yellow-255-text"}`,
             style: {
                 textAlign: "end"
@@ -7256,7 +7369,7 @@ function Welcome({ onDaySelected  }) {
 }
 function useDay(dayKey) {
     return Me1.useMemo(()=>{
-        return Object.values(mod14)[dayKey];
+        return Object.values(mod16)[dayKey];
     }, [
         dayKey
     ]);
@@ -7611,7 +7724,7 @@ function DaySelector({ selectedDay , onDayChange  }) {
     }))));
 }
 function DaysList({ selectedDay , onDayChange  }) {
-    const daysKeys = Me1.useRef(Object.keys(mod14));
+    const daysKeys = Me1.useRef(Object.keys(mod16));
     return Me1.createElement("ul", null, daysKeys.current.map((day, i)=>Me1.createElement("li", {
             key: day,
             className: selectedDay === i ? "green-255" : ""
