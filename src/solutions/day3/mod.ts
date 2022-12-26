@@ -1,6 +1,8 @@
 import { partOne } from "./partOne/mod.ts";
 import { partTwo } from "./partTwo/mod.ts";
 
+export const partTwoAvailable=true;
+
 export function validate(text: string): boolean {
   return text.trim().split("\n").every((line) =>
     /^[a-zA-Z]{2,}$/.test(line.trim())

@@ -1,6 +1,8 @@
 import { partOne } from "./partOne/mod.ts";
 import { partTwo } from "./partTwo/mod.ts";
 
+export const partTwoAvailable=false;
+
 export function validate(text: string): boolean {
   return false;
 }

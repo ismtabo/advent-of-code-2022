@@ -2,6 +2,8 @@ import { partOne } from "./partOne/mod.ts";
 import { partTwo } from "./partTwo/mod.ts";
 import { Operation, Register } from "./types.d.ts";
 
+export const partTwoAvailable=false;
+
 export function validate(text: string): boolean {
   return false;
 }

@@ -2,6 +2,8 @@ import { partOne } from "./partOne/mod.ts";
 import { partTwo } from "./partTwo/mod.ts";
 import { Direction } from "./types.ts";
 
+export const partTwoAvailable=true;
+
 export function validate(text: string): boolean {
   return text.trim().split("\n").every((line) =>
     /^[ULRD] \d+$/.test(line.trim())

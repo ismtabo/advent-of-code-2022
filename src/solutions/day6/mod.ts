@@ -1,6 +1,8 @@
 import { partOne } from "./partOne/mod.ts";
 import { partTwo } from "./partTwo/mod.ts";
 
+export const partTwoAvailable=true;
+
 export function validate(text: string): boolean {
   return /^[a-z]+$/.test(text.trim());
 }

@@ -40,17 +40,23 @@ function DaysList({ selectedDay, onDayChange }: DaySelectorProps) {
   const daysKeys = React.useRef(Object.keys(solutions));
   return (
     <ul>
-      {daysKeys.current.map((day, i) => (
-        <li key={day} className={selectedDay === i ? "green-255" : ""}>
-          <a
-            href="#"
-            onClick={() =>
-              onDayChange(i)}
+      {daysKeys.current.map((day) => {
+        const dayNumber =
+          parseInt(day.match(/day(?<number>\d+)/)!.groups!.number) - 1;
+        return (
+          <li
+            key={day}
+            className={selectedDay === dayNumber ? "green-255" : ""}
           >
-            <ColoredCaps>Day {i + 1}</ColoredCaps>
-          </a>
-        </li>
-      ))}
+            <a
+              href="#"
+              onClick={() => onDayChange(dayNumber)}
+            >
+              <ColoredCaps>Day {dayNumber + 1}</ColoredCaps>
+            </a>
+          </li>
+        );
+      })}
     </ul>
   );
 }

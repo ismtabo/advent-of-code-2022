@@ -1,16 +1,16 @@
 import { partOne } from "./partOne/mod.ts";
 import { partTwo } from "./partTwo/mod.ts";
 
-export const partTwoAvailable=true;
+export const partTwoAvailable=false;
 
 export function validate(text: string): boolean {
   return text.trim().split("\n").every((line) =>
-    /^[ABC] [XYZ]$/.test(line.trim())
+    /^[012][012=-]+$/.test(line.trim())
   );
 }
 
 export function preprocess(text: string) {
-  return text.trim().split("\n").map((line) => line.split(" "));
+  return text.trim().split("\n").map((line) => line.trim());
 }
 
 export function main(text: string, isPart2: boolean) {

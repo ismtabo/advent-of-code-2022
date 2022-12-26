@@ -17,7 +17,7 @@ export function Day({ day: dayKey, onDaySelected }: DayProps) {
     <InvalidInputDialogContent day={dayKey} />,
   );
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
-  const { validate, preprocess, partOne, partTwo, main } = useDay(
+  const { validate, preprocess, partOne, partTwo, partTwoAvailable } = useDay(
     dayKey,
   );
   const [input, setInput] = React.useState("");
@@ -239,7 +239,9 @@ export function Day({ day: dayKey, onDaySelected }: DayProps) {
                     onChange={handlePartChange}
                   >
                     <option value="part1">Part 1</option>
-                    <option value="part2">Part 2</option>
+                    {partTwoAvailable
+                      ? <option value="part2">Part 2</option>
+                      : null}
                   </select>
                 </div>
                 <div className="input-group">

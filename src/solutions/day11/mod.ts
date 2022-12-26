@@ -2,6 +2,8 @@ import { partOne } from "./partOne/mod.ts";
 import { partTwo } from "./partTwo/mod.ts";
 import { Operation } from "./types.d.ts";
 
+export const partTwoAvailable=true;
+
 export function validate(text: string): boolean {
   return text.trim().split("\n\n").every((monkeyLines) => {
     const [
